@@ -34,7 +34,7 @@ var temporal = builder.AddTemporalServerExecutable("temporal");
 
 // OR customise server options with builder
 //      see config section for details
-var temporal = builder.AddTemporalServerExecutable("temporal", x => x.WithNamespace("test1", "test2").Build());
+var temporal = builder.AddTemporalServerExecutable("temporal", x => x.WithNamespace("test1", "test2"));
 
 
 // ...
@@ -103,7 +103,7 @@ If done correctly, you should tracing and metrics on the Aspire dashboard:
 The dev server can be configured with a fluent builder
 
 ```csharp
-builder.AddTemporalServerExecutable("temporal", builder => builder.WithPort(1234).Build())
+builder.AddTemporalServerExecutable("temporal", builder => builder.WithPort(1234))
 ```
 
 You can run `temporal server start-dev --help` to get more information about the CLI flags on the dev server. All available flags are mapped to a method on the builder.
@@ -126,5 +126,4 @@ builder
     .WithLogFormat(LogFormat.Pretty)                // --log-format
     .WithLogLevel(LogLevel.Info)                    // --log-level
     .WithSQLitePragma(SQLitePragma.JournalMode)     // --sqlite-pragma
-    .Build()
 ```
