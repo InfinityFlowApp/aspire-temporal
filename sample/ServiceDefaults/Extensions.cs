@@ -1,3 +1,5 @@
+using System.Diagnostics.Metrics;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +9,10 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+
+using Temporalio.Extensions.DiagnosticSource;
+using Temporalio.Extensions.OpenTelemetry;
+using Temporalio.Runtime;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -44,7 +50,8 @@ public static class Extensions
             .WithMetrics(metrics =>
             {
                 metrics.AddRuntimeInstrumentation()
-                       .AddBuiltInMeters();
+                       .AddBuiltInMeters()
+                       .AddMeter("Temporal.Client");
             })
             .WithTracing(tracing =>
             {
@@ -56,7 +63,11 @@ public static class Extensions
 
                 tracing.AddAspNetCoreInstrumentation()
                        .AddGrpcClientInstrumentation()
-                       .AddHttpClientInstrumentation();
+                       .AddHttpClientInstrumentation()
+                       .AddSource(
+                            TracingInterceptor.ClientSource.Name,
+                            TracingInterceptor.WorkflowsSource.Name,
+                            TracingInterceptor.ActivitiesSource.Name);
             });
 
         builder.AddOpenTelemetryExporters();

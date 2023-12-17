@@ -9,11 +9,16 @@ if (builder.Configuration[TemporalDbConfigName] is not string temporalDb)
     throw new Exception($"Set the {TemporalDbConfigName} in your appsettings.Development.json");
 }
 
-builder.AddTemporalServerExecutable("temporal", x => x
+var temporal = builder.AddTemporalServerExecutable("temporal", x => x
     .WithLogFormat(LogFormat.Pretty)
     .WithLogLevel(LogLevel.Info)
     .WithDbFileName(temporalDb)
-    .WithNamespace("test1", "test2")
-    .Build());
+    .WithNamespace("test1", "test2"));
+
+builder.AddProject<Projects.Api>("api")
+    .WithReference(temporal);
+
+builder.AddProject<Projects.Worker>("worker")
+    .WithReference(temporal);
 
 builder.Build().Run();

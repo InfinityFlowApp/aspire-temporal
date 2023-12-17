@@ -2,6 +2,12 @@
 
 Aspire extension to start the temporal cli dev server as an executable resource
 
+## Contents:
+- [Pre-Requisites](#pre-requisites)
+- [Getting Started](#getting-started)
+- [Observability](#observability)
+- [Configuration](#configuration)
+
 ## Pre-requisites
 
 - [Temporal CLI](https://github.com/temporalio/cli) (ensure the binary is in your PATH)
@@ -43,6 +49,54 @@ Temporal will be available on its default ports:
 - UI: http://localhost:8233
 
 ![Aspire dashboard temporal exe](./docs/aspire-dashboard-exe.png)
+
+### 4. Configure Client/Worker Applications
+
+Clients & Workers can be configured as normal using the instructions from the [temporal dotnet sdk repo](https://github.com/temporalio/sdk-dotnet/). The TargetHost is injected under the key `ConnectionStrings:<Aspire Resource Name>`, so using the example above we can get the host using `builder.Configuration["ConnectionStrings:temporal"]` which will give us the value `localhost:7233`.
+
+If using [Temporalio.Extensions.Hosting](https://github.com/temporalio/sdk-dotnet/blob/main/src/Temporalio.Extensions.Hosting/README.md) this might look something like:
+
+```csharp
+// client
+builder.Services
+    .AddTemporalClient(opts =>
+    {
+        opts.TargetHost = builder.Configuration["ConnectionStrings:temporal"];
+        opts.Namespace = "default";
+    })
+
+// worker
+builder.Services
+    .AddTemporalClient(opts =>
+    {
+        opts.TargetHost = builder.Configuration["ConnectionStrings:temporal"];
+        opts.Namespace = "default";
+    })
+    .AddHostedTemporalWorker("my-task-queue")
+    .AddScopedActivities<MyActivities>()
+    .AddWorkflow<MyWorkflow>();
+```
+
+## Observability
+
+The extension doesn't provide any setup for observability, but you can follow [Temporalio.Extensions.DiagnosticSource](https://github.com/temporalio/sdk-dotnet/blob/main/src/Temporalio.Extensions.DiagnosticSource/README.md) and [Temporalio.Extensions.Hosting](https://github.com/temporalio/sdk-dotnet/blob/main/src/Temporalio.Extensions.Hosting/TemporalHostingServiceCollectionExtensions.cs) to configure this on the temporal client. If using the Aspire Service Defaults, you'll need to configure the metrics and tracing accordingly.
+
+The sample folder has an example for configuring this with the Aspire Dashboard
+
+- [sample/Api/Program.cs](./sample/Api/Program.cs) for an example client
+- [sample/Worker/Program.cs](./sample/Worker/Program.cs) for an example worker
+- [sample/ServiceDefaults/Extensions.cs](./sample/ServiceDefaults/Extensions.cs) for an example of adding the custom meter and tracing sources to the service defaults.
+
+If done correctly, you should tracing and metrics on the Aspire dashboard:
+
+#### Tracing
+
+![aspire dashboard temporal tracing](./docs/aspire-dashboard-temporal-tracing.png)
+
+#### Metrics
+
+![aspire dashboard temporal metrics](./docs/aspire-dashboard-temporal-metrics.png)
+
 
 ## Configuration
 

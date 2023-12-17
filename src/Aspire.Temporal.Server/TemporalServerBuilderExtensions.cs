@@ -1,4 +1,6 @@
-﻿namespace Aspire.Temporal.Server;
+﻿using System.Net.Sockets;
+
+namespace Aspire.Temporal.Server;
 
 public static class TemporalServerBuilderExtensions
 {
@@ -10,9 +12,13 @@ public static class TemporalServerBuilderExtensions
     /// <param name="callback"></param>
     /// <returns></returns>
     public static IResourceBuilder<TemporalServerExecutableResource> AddTemporalServerExecutable(this IDistributedApplicationBuilder builder, string name,
-        Func<TemporalServerExecutableResourceBuilder, TemporalServerExecutableResourceArguments> callback)
+        Action<TemporalServerExecutableResourceBuilder> callback)
     {
-        return builder.AddResource(new TemporalServerExecutableResource(name, callback(new TemporalServerExecutableResourceBuilder())));
+        var rb = new TemporalServerExecutableResourceBuilder();
+        callback(rb);
+        var args = rb.Build();
+
+        return builder.AddTemporalServerExecutable(name, args);
     }
 
     /// <summary>
@@ -23,6 +29,36 @@ public static class TemporalServerBuilderExtensions
     /// <returns></returns>
     public static IResourceBuilder<TemporalServerExecutableResource> AddTemporalServerExecutable(this IDistributedApplicationBuilder builder, string name)
     {
-        return builder.AddResource(new TemporalServerExecutableResource(name, new TemporalServerExecutableResourceArguments()));
+        return builder.AddTemporalServerExecutable(name, new TemporalServerExecutableResourceArguments());
+    }
+
+    private static IResourceBuilder<TemporalServerExecutableResource> AddTemporalServerExecutable(this IDistributedApplicationBuilder builder, string name,
+        TemporalServerExecutableResourceArguments args)
+    {
+        const int DefaultPort = 7233;
+
+        var port = args.Port ?? DefaultPort;
+        var uiPort = args.UiPort ?? port + 1000;
+
+        var resourceBuilder = builder.AddResource(new TemporalServerExecutableResource(name, args))
+            .WithAnnotation(new ServiceBindingAnnotation(protocol: ProtocolType.Tcp, name: "server", uriScheme: "http", port: port, isExternal: true));
+
+
+        if (args.Headless is not true)
+        {
+            resourceBuilder.WithAnnotation(new ServiceBindingAnnotation(protocol: ProtocolType.Tcp, name: "ui", uriScheme: "http", port: uiPort, isExternal: true));
+        }
+
+        if (args.MetricsPort is not null)
+        {
+            resourceBuilder.WithAnnotation(new ServiceBindingAnnotation(protocol: ProtocolType.Tcp, name: "metrics", uriScheme: "http", port: args.MetricsPort, isExternal: true));
+        }
+
+        if (args.HttpPort is not null)
+        {
+            resourceBuilder.WithAnnotation(new ServiceBindingAnnotation(protocol: ProtocolType.Tcp, name: "http", uriScheme: "http", port: args.HttpPort, isExternal: true));
+        }
+
+        return resourceBuilder;
     }
 }
