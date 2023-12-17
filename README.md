@@ -28,7 +28,7 @@ var temporal = builder.AddTemporalServerExecutable("temporal");
 
 // OR customise server options with builder
 //      see config section for details
-var temporal = builder.AddTemporalServerExecutable("temporal", x => x.WithNamespace("test1", "test2"));
+var temporal = builder.AddTemporalServerExecutable("temporal", x => x.WithNamespace("test1", "test2").Build());
 
 
 // ...
@@ -43,3 +43,34 @@ Temporal will be available on its default ports:
 - UI: http://localhost:8233
 
 ![Aspire dashboard temporal exe](./docs/aspire-dashboard-exe.png)
+
+## Configuration
+
+The dev server can be configured with a fluent builder
+
+```csharp
+builder.AddTemporalServerExecutable("temporal", builder => builder.WithPort(1234).Build())
+```
+
+You can run `temporal server start-dev --help` to get more information about the CLI flags on the dev server. All available flags are mapped to a method on the builder.
+
+Available methods:
+
+```csharp
+builder
+    .WithDbFileName("/location/of/persistent/file") // --db-filename
+    .WithNamespace("namespace-name", ...)           // --namespace
+    .WithPort(7233)                                 // --port
+    .WithHttpPort(7234)                             // --http-port
+    .WithMetricsPort(7235)                          // --metrics-port
+    .UiPort(8233)                                   // --ui-port
+    .WithHeadlessUi(true)                           // --headless
+    .WithIp("127.0.0.1")                            // --ip
+    .WithUiIp("127.0.0.1")                          // --ui-ip
+    .WithUiAssetPath("/location/of/custom/assets")  // --ui-asset-path
+    .WithUiCodecEndpoint("http://localhost:8080")   // --ui-codec-endpoint
+    .WithLogFormat(LogFormat.Pretty)                // --log-format
+    .WithLogLevel(LogLevel.Info)                    // --log-level
+    .WithSQLitePragma(SQLitePragma.JournalMode)     // --sqlite-pragma
+    .Build()
+```
