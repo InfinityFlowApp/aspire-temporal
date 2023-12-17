@@ -10,10 +10,11 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting" Version="8.0.0-preview.1.23557.2" />
+    <PackageReference Include="sains1.Aspire.Temporal.Server" Version="0.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- <ItemGroup>
     <ProjectReference Include="..\..\src\Aspire.Temporal.Server\Aspire.Temporal.Server.csproj" />
-  </ItemGroup>
+  </ItemGroup> -->
 
 </Project>
