@@ -52,24 +52,41 @@ Temporal will be available on its default ports:
 
 ### 4. Configure Client/Worker Applications
 
-Clients & Workers can be configured as normal using the instructions from the [temporal dotnet sdk repo](https://github.com/temporalio/sdk-dotnet/). The TargetHost is injected under the key `ConnectionStrings:<Aspire Resource Name>`, so using the example above we can get the host using `builder.Configuration["ConnectionStrings:temporal"]` which will give us the value `localhost:7233`.
+The Temporal client can then be added to a .NET project as normal using the instructions from the [temporal dotnet sdk repo](https://github.com/temporalio/sdk-dotnet/)
 
-If using [Temporalio.Extensions.Hosting](https://github.com/temporalio/sdk-dotnet/blob/main/src/Temporalio.Extensions.Hosting/README.md) this might look something like:
+It can be included in Aspire orchestration like below and can optionally take a reference to the Temporal resource.
 
 ```csharp
-// client
+// ./samples/AppHost/Program.cs
+
+// ...
+
+var temporal = builder.AddTemporalServerExecutable("temporal");
+
+builder.AddProject<Projects.Worker>("worker") // my custom project
+    .WithReference(temporal);
+
+// ...
+```
+
+If using [Temporalio.Extensions.Hosting](https://github.com/temporalio/sdk-dotnet/blob/main/src/Temporalio.Extensions.Hosting/README.md) the client registration might look something like below. If we took the reference to the Temporal Aspire resource, then the TargetHost property is automatically injected under the key `ConnectionStrings:<Aspire Resource Name>`. (e.g., this will be `builder.Configuration["ConnectionStrings:temporal"]` for a resource named "temporal" as above)
+
+```csharp
+// register a client -  ./samples/Api/Program.cs
 builder.Services
     .AddTemporalClient(opts =>
     {
-        opts.TargetHost = builder.Configuration["ConnectionStrings:temporal"];
+        opts.TargetHost = builder.Configuration["ConnectionStrings:temporal"]; // or just self-configure localhost:7233
         opts.Namespace = "default";
     })
 
-// worker
+// or
+
+// register a worker - ./samples/Worker/Program.cs
 builder.Services
     .AddTemporalClient(opts =>
     {
-        opts.TargetHost = builder.Configuration["ConnectionStrings:temporal"];
+        opts.TargetHost = builder.Configuration["ConnectionStrings:temporal"]; // or just self-configure localhost:7233
         opts.Namespace = "default";
     })
     .AddHostedTemporalWorker("my-task-queue")
