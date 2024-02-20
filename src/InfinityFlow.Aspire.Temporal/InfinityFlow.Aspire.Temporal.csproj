@@ -3,21 +3,32 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageIcon>packageIcon.png</PackageIcon>
     <IsPackable>true</IsPackable>
     <EnablePackageValidation>true</EnablePackageValidation>
     <PackageId>InfinityFlow.Aspire.Temporal</PackageId>
     <PackageVersion>0.3.0</PackageVersion>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageTags>dotnet;aspire;temporal</PackageTags>
     <Description>Aspire extension to start the temporal cli dev server as an container or executable resource. Only container is well-supported currently.</Description>
     <RepositoryUrl>https://github.com/InfinityFlowApp/aspire-temporal-server</RepositoryUrl>
     <Authors>InfinityFlow</Authors>
     <Copyright>Copyright ©️ InfinityFlow</Copyright>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
-
+    <ItemGroup>
+        <!-- Assets -->
+        <None Pack="true" PackagePath="" Include="assets/packageIcon.png" />
+        <None Pack="true" PackagePath="" Include="$(SolutionDir)/README.md" Link="assets/README.md" />
+        <None Pack="true" PackagePath="" Include="$(SolutionDir)/LICENSE" Link="assets/LICENSE" />
+ 
+    </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     <PackageReference Include="Aspire.Hosting" Version="8.0.0-preview.3.24105.21" />
     <PackageReference Include="Docker.DotNet" Version="3.125.15" />
     <PackageReference Include="Testcontainers" Version="3.7.0" />
