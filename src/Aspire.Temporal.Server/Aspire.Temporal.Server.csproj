@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
     <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageId>Asspire.Temporal.Server</PackageId>
+    <PackageId>InfinityFlow.Temporal</PackageId>
     <PackageVersion>0.3.0</PackageVersion>
     <PackageTags>dotnet aspire temporal</PackageTags>
     <Description>Aspire extension to start the temporal cli dev server as an container or executable resource. Only container is well-supported currently.</Description>
