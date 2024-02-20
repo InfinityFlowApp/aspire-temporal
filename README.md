@@ -1,6 +1,6 @@
 # Temporal Dev Server Aspire Component
 
- [![NuGet](https://img.shields.io/nuget/v/Microsoft.Orleans.Core.svg?style=flat)](http://www.nuget.org/profiles/Orleans)
+ [![NuGet](https://img.shields.io/nuget/v/InfinityFlow.Aspire.Temporal.svg?style=flat)](http://www.nuget.org/profiles/InfinityFlow)
  
  [![Discord](https://discordapp.com/api/guilds/1148334798524383292/widget.png?style=banner2)](https://discord.gg/PXJFbP7PKk)
 
