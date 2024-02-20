@@ -21,13 +21,6 @@ updates:
         patterns:
           - "Microsoft.*"
           - "System.*"
-  - package-ecosystem: "docker" # See documentation for possible values
-    directory: "/kustomize"
-    schedule:
-      interval: "daily"
-    labels:
-      - "dependencies"
-    open-pull-requests-limit: 10
   - package-ecosystem: "gitsubmodule" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
@@ -41,9 +34,4 @@ updates:
       interval: "daily"
     labels:
       - "dependencies"
-  - package-ecosystem: "devcontainers"
-    directory: "/.devcontainer" # Location of package manifests
-    schedule:
-      interval: "daily"
-    labels:
-      - "maintenance"
+
