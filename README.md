@@ -1,6 +1,6 @@
 # InfinityFlow.Aspire.Temporal
 
-[![NuGet](https://img.shields.io/nuget/v/InfinityFlow.Aspire.Temporal.svg?style=flat)](http://www.nuget.org/profiles/InfinityFlow)
+[![NuGet](https://img.shields.io/nuget/v/InfinityFlow.Aspire.Temporal.svg?style=flat)](https://www.nuget.org/packages/InfinityFlow.Aspire.Temporal)
  
 [![Discord](https://discordapp.com/api/guilds/1148334798524383292/widget.png?style=banner2)](https://discord.gg/PXJFbP7PKk)
 
