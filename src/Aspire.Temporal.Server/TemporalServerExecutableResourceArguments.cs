@@ -34,7 +34,7 @@ public class TemporalServerExecutableResourceArguments
         }
 
         result.Add("--port");
-        result.Add((Port - 1).ToString());
+        result.Add(Port.ToString());
 
         if (HttpPort is not null)
         {
@@ -51,7 +51,7 @@ public class TemporalServerExecutableResourceArguments
         if (UiPort is not null)
         {
             result.Add("--ui-port");
-            result.Add(((UiPort ?? 8233) - 1).ToString()!);
+            result.Add(UiPort.ToString()!);
         }
 
         if (Headless is not null)

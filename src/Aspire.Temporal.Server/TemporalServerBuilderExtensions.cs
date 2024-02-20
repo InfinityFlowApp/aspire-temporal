@@ -1,7 +1,5 @@
 ﻿using System.Net.Sockets;
 
-using Aspire.Hosting;
-
 namespace Aspire.Temporal.Server;
 
 public static class TemporalServerBuilderExtensions
@@ -39,11 +37,11 @@ public static class TemporalServerBuilderExtensions
     {
         var resourceBuilder = builder.AddResource(new TemporalServerExecutableResource(name, args));
 
-        resourceBuilder.WithHttpEndpoint(containerPort: args.Port-1, hostPort: args.Port, name: "server").AsHttp2Service();
+        resourceBuilder.WithHttpEndpoint(hostPort: args.Port, name: "server").AsHttp2Service();
 
         if (args.Headless is not true)
         {
-            resourceBuilder.WithHttpEndpoint(containerPort: args.UiPort.GetValueOrDefault(8080)-1, hostPort: args.UiPort ?? args.Port + 1000, name: "ui");
+            resourceBuilder.WithHttpEndpoint(hostPort: args.UiPort ?? args.Port + 1000, name: "ui");
         }
 
         if (args.MetricsPort is not null)
