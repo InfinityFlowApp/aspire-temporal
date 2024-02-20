@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,12 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting" Version="8.0.0-preview.1.23557.2" />
-    <!--<PackageReference Include="sains1.Aspire.Temporal.Server" Version="0.1.0" />-->
+    <PackageReference Include="Aspire.Hosting" Version="8.0.0-preview.3.24105.21" />
   </ItemGroup>
 
    <ItemGroup>
-    <ProjectReference Include="..\..\src\Aspire.Temporal.Server\Aspire.Temporal.Server.csproj" />
+    <ProjectReference Include="..\..\src\InfinityFlow.Aspire.Temporal\InfinityFlow.Aspire.Temporal.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\Api\Api.csproj" />
     <ProjectReference Include="..\Worker\Worker.csproj" />
   </ItemGroup> 

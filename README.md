@@ -1,7 +1,12 @@
-# InfinityFlow Aspire.Temporal
+# InfinityFlow.Aspire.Temporal
 
+[![NuGet](https://img.shields.io/nuget/v/InfinityFlow.Aspire.Temporal.svg?style=flat)](http://www.nuget.org/profiles/InfinityFlow)
+ 
+[![Discord](https://discordapp.com/api/guilds/1148334798524383292/widget.png?style=banner2)](https://discord.gg/PXJFbP7PKk)
 
-Aspire extension to start the temporal cli dev server as an container or executable resource
+Aspire extension to start the temporal cli dev server as an container or executable resource. 
+**Note: Only container works as expected. See https://github.com/dotnet/aspire/issues/1637 and https://github.com/temporalio/cli/issues/316**
+
 
 ## Contents:
 - [Pre-Requisites](#pre-requisites)
@@ -31,14 +36,14 @@ using Aspire.Temporal.Server;
 var builder = DistributedApplication.CreateBuilder(args);
 
 // Use the default server options
-var temporal = builder.AddTemporalServerExecutable("temporal");
+var temporal = await builder.AddTemporalServerContainer("temporal")
 
 // OR customise server options with builder
 //      see config section for details
-var temporal = builder.AddTemporalServerExecutable("temporal", x => x.WithNamespace("test1", "test2"));
-
-
-// ...
+var temporal = await builder.AddTemporalServerContainer("temporal", x => x
+    .WithLogFormat(LogFormat.Json)
+    .WithLogLevel(LogLevel.Info)
+    .WithNamespace("test1", "test2"));
 ```
 
 ### 3. Run the Aspire application
@@ -121,7 +126,7 @@ If done correctly, you should tracing and metrics on the Aspire dashboard:
 The dev server can be configured with a fluent builder
 
 ```csharp
-builder.AddTemporalServerExecutable("temporal", builder => builder.WithPort(1234))
+await builder.AddTemporalServerContainer("temporal", builder => builder.WithPort(1234))
 ```
 
 You can run `temporal server start-dev --help` to get more information about the CLI flags on the dev server. All available flags are mapped to a method on the builder.

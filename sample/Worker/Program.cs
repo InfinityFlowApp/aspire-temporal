@@ -36,7 +36,6 @@ builder.Services
 var host = builder.Build();
 host.Run();
 
-
 public static class Constants
 {
     public const string TaskQueueName = "aspire-worker-task-queue";

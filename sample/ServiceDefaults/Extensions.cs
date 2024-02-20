@@ -1,5 +1,3 @@
-using System.Diagnostics.Metrics;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,9 +8,7 @@ using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
-using Temporalio.Extensions.DiagnosticSource;
 using Temporalio.Extensions.OpenTelemetry;
-using Temporalio.Runtime;
 
 namespace Microsoft.Extensions.Hosting;
 
