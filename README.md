@@ -19,7 +19,7 @@ Aspire extension to start the temporal cli dev server as an container or executa
 ### 1. Install the nuget package
 
 ```sh
-dotnet add package Asspire.Temporal.Server
+dotnet add package InfinityFlow.Aspire.Temporal
 ```
 
 ### 2. Add Temporal dev server to your Aspire AppHost Program.cs
