@@ -169,4 +169,3 @@ public class TemporalServerResourceArguments
         _ => throw new ArgumentOutOfRangeException(nameof(pragma), pragma, null),
     };
 }
- 
