@@ -1,5 +1,6 @@
-﻿namespace Aspire.Temporal.Server;
+﻿using InfinityFlow.Aspire.Temporal;
 
+namespace Aspire.Hosting;
 public static class TemporalServerExecutableBuilderExtensions
 {
     /// <summary>

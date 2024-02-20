@@ -5,11 +5,16 @@
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
     <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageId>InfinityFlow.Temporal</PackageId>
+    <PackageId>InfinityFlow.Aspire.Temporal</PackageId>
     <PackageVersion>0.3.0</PackageVersion>
-    <PackageTags>dotnet aspire temporal</PackageTags>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageTags>dotnet;aspire;temporal</PackageTags>
     <Description>Aspire extension to start the temporal cli dev server as an container or executable resource. Only container is well-supported currently.</Description>
     <RepositoryUrl>https://github.com/InfinityFlowApp/aspire-temporal-server</RepositoryUrl>
+    <Authors>InfinityFlow</Authors>
+    <Copyright>Copyright ©️ InfinityFlow</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

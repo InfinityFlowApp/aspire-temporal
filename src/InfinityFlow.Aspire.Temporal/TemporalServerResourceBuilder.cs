@@ -1,4 +1,6 @@
-﻿namespace Aspire.Temporal.Server;
+﻿using InfinityFlow.Aspire.Temporal;
+
+namespace Aspire.Hosting;
 
 public class TemporalServerResourceBuilder
 {
@@ -160,7 +162,7 @@ public class TemporalServerResourceBuilder
     /// <summary>
     /// Specify namespaces that should be pre-created (namespace "default" is always created)
     /// </summary>
-    /// <param name="ns"></param>
+    /// <param name="namespaces"></param>
     /// <returns></returns>
     public TemporalServerResourceBuilder WithNamespace(params string[] namespaces)
     {

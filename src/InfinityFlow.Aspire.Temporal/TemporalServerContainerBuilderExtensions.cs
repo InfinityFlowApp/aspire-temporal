@@ -1,7 +1,8 @@
 ﻿using DotNet.Testcontainers.Builders;
 
-namespace Aspire.Temporal.Server;
+using InfinityFlow.Aspire.Temporal;
 
+namespace Aspire.Hosting;
 public static class TemporalServerContainerBuilderExtensions
 {
     /// <summary>
@@ -27,7 +28,7 @@ public static class TemporalServerContainerBuilderExtensions
     /// <param name="builder"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public  static Task<IResourceBuilder<TemporalServerContainerResource>> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name)
+    public static Task<IResourceBuilder<TemporalServerContainerResource>> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name)
     {
         return builder.AddTemporalServerContainer(name, new TemporalServerResourceArguments());
     }
@@ -68,8 +69,7 @@ public static class TemporalServerContainerBuilderExtensions
     ENTRYPOINT ["/temporal"]
     """;
 
-    private static async Task<IResourceBuilder<TemporalServerContainerResource>> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name,
-        TemporalServerResourceArguments args)
+    private static async Task<IResourceBuilder<TemporalServerContainerResource>> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name, TemporalServerResourceArguments args)
     {
         await BuildAspireHelperContainer();
 

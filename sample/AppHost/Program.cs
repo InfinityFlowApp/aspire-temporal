@@ -1,4 +1,4 @@
-using Aspire.Temporal.Server;
+using InfinityFlow.Aspire.Temporal;
 
 var builder = DistributedApplication.CreateBuilder(args);
 

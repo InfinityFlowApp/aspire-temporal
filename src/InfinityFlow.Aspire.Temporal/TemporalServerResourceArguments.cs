@@ -1,4 +1,5 @@
-﻿namespace Aspire.Temporal.Server;
+﻿namespace InfinityFlow.Aspire.Temporal;
+
 /// <summary>
 /// Represents the arguments required to configure and start a Temporal server.
 /// </summary>
@@ -106,19 +107,19 @@ public class TemporalServerResourceArguments
         if (LogFormat.HasValue)
         {
             result.Add("--log-format");
-            result.Add(LogFormatToString(LogFormat.Value));
+            result.Add(EnumHelpers.LogFormatToString(LogFormat.Value));
         }
 
         if (LogLevel.HasValue)
         {
             result.Add("--log-level");
-            result.Add(LogLevelToString(LogLevel.Value));
+            result.Add(EnumHelpers.LogLevelToString(LogLevel.Value));
         }
 
         if (SQLitePragma.HasValue)
         {
             result.Add("--sqlite-pragma");
-            result.Add(SQLitePragmaToString(SQLitePragma.Value));
+            result.Add(EnumHelpers.SQLitePragmaToString(SQLitePragma.Value));
         }
 
         foreach (var name in Namespaces)
@@ -144,28 +145,4 @@ public class TemporalServerResourceArguments
         list.Add(argument);
         list.Add(value);
     }
-
-    private static string LogFormatToString(LogFormat logFormat) => logFormat switch
-    {
-        Server.LogFormat.Pretty => "pretty",
-        Server.LogFormat.Json => "json",
-        _ => throw new ArgumentOutOfRangeException(nameof(logFormat), logFormat, null),
-    };
-
-    private static string LogLevelToString(LogLevel level) => level switch
-    {
-        Server.LogLevel.Debug => "debug",
-        Server.LogLevel.Info => "info",
-        Server.LogLevel.Warn => "warn",
-        Server.LogLevel.Error => "error",
-        Server.LogLevel.Fatal => "fatal",
-        _ => throw new ArgumentOutOfRangeException(nameof(level), level, null),
-    };
-
-    private static string SQLitePragmaToString(SQLitePragma pragma) => pragma switch
-    {
-        Server.SQLitePragma.JournalMode => "journal_mode",
-        Server.SQLitePragma.Synchronous => "synchronous",
-        _ => throw new ArgumentOutOfRangeException(nameof(pragma), pragma, null),
-    };
 }

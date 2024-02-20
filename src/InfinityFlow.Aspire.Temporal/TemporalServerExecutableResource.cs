@@ -1,4 +1,6 @@
-﻿namespace Aspire.Temporal.Server;
+﻿using InfinityFlow.Aspire.Temporal;
+
+namespace Aspire.Hosting;
 
 public class TemporalServerExecutableResource(string name, TemporalServerResourceArguments arguments) : ExecutableResource(name, command: "temporal", workingDirectory: "", args: arguments.GetArgs()), IResourceWithConnectionString
 {
