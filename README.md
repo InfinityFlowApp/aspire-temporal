@@ -1,5 +1,9 @@
 # Temporal Dev Server Aspire Component
 
+ [![NuGet](https://img.shields.io/nuget/v/Microsoft.Orleans.Core.svg?style=flat)](http://www.nuget.org/profiles/Orleans)
+ 
+ [![Discord](https://discordapp.com/api/guilds/1148334798524383292/widget.png?style=banner2)](https://discord.gg/PXJFbP7PKk)
+
 Aspire extension to start the temporal cli dev server as an container or executable resource. 
 **Note: Only container works as expected. See https://github.com/dotnet/aspire/issues/1637 and https://github.com/temporalio/cli/issues/316**
 
