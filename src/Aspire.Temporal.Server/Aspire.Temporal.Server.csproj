@@ -6,11 +6,11 @@
     <Nullable>enable</Nullable>
     <IsPackable>true</IsPackable>
     <EnablePackageValidation>true</EnablePackageValidation>
-    <PackageId>sains1.Aspire.Temporal.Server</PackageId>
+    <PackageId>Asspire.Temporal.Server</PackageId>
     <PackageVersion>0.2.0</PackageVersion>
-    <PackageTags>aspire temporal</PackageTags>
+    <PackageTags>dotnet aspire temporal</PackageTags>
     <Description>Aspire extension to start the temporal cli dev server as an executable resource</Description>
-    <RepositoryUrl>https://github.com/sains1/temporal-server-aspire-component</RepositoryUrl>
+    <RepositoryUrl>https://github.com/InfinityFlowApp/temporal-server-aspire-component</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
