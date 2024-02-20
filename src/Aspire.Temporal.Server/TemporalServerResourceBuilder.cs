@@ -1,17 +1,17 @@
 ﻿namespace Aspire.Temporal.Server;
 
-public class TemporalServerExecutableResourceBuilder
+public class TemporalServerResourceBuilder
 {
-    private readonly TemporalServerExecutableResourceArguments args = new();
+    private TemporalServerResourceArguments Args { get; } = new();
 
     /// <summary>
     /// Command to execute (default: "temporal")
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithCommand(string command = "temporal")
+    public TemporalServerResourceBuilder WithCommand(string command = "temporal")
     {
-        args.Command = command;
+        Args.Command = command;
         return this;
     }
 
@@ -19,9 +19,9 @@ public class TemporalServerExecutableResourceBuilder
     /// File in which to persist Temporal state (by default, Workflows are lost when the process dies)
     /// </summary>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithDbFileName(string dbFileName)
+    public TemporalServerResourceBuilder WithDbFileName(string dbFileName)
     {
-        args.DbFileName = dbFileName;
+        Args.DbFileName = dbFileName;
         return this;
     }
 
@@ -30,9 +30,9 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="port"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithPort(int port)
+    public TemporalServerResourceBuilder WithPort(int port)
     {
-        args.Port = port;
+        Args.Port = port;
         return this;
     }
 
@@ -41,9 +41,9 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="httpPort"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithHttpPort(int httpPort)
+    public TemporalServerResourceBuilder WithHttpPort(int httpPort)
     {
-        args.HttpPort = httpPort;
+        Args.HttpPort = httpPort;
         return this;
     }
 
@@ -52,9 +52,9 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="metricsPort"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithMetricsPort(int metricsPort)
+    public TemporalServerResourceBuilder WithMetricsPort(int metricsPort)
     {
-        args.MetricsPort = metricsPort;
+        Args.MetricsPort = metricsPort;
         return this;
     }
 
@@ -63,9 +63,9 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="uiPort"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithUiPort(int uiPort)
+    public TemporalServerResourceBuilder WithUiPort(int uiPort)
     {
-        args.UiPort = uiPort;
+        Args.UiPort = uiPort;
         return this;
     }
 
@@ -74,9 +74,9 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="headless"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithHeadlessUi(bool headless)
+    public TemporalServerResourceBuilder WithHeadlessUi(bool headless)
     {
-        args.Headless = headless;
+        Args.Headless = headless;
         return this;
     }
 
@@ -85,9 +85,9 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="ip"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithIp(string ip)
+    public TemporalServerResourceBuilder WithIp(string ip)
     {
-        args.Ip = ip;
+        Args.Ip = ip;
         return this;
     }
 
@@ -96,9 +96,9 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="uiIp"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithUiIp(string uiIp)
+    public TemporalServerResourceBuilder WithUiIp(string uiIp)
     {
-        args.UiIp = uiIp;
+        Args.UiIp = uiIp;
         return this;
     }
 
@@ -107,9 +107,9 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="assetsPath"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithUiAssetsPath(string assetsPath)
+    public TemporalServerResourceBuilder WithUiAssetsPath(string assetsPath)
     {
-        args.UiAssetPath = assetsPath;
+        Args.UiAssetPath = assetsPath;
         return this;
     }
 
@@ -118,9 +118,9 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="codecEndpoint"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithUiCodecEndpoint(string codecEndpoint)
+    public TemporalServerResourceBuilder WithUiCodecEndpoint(string codecEndpoint)
     {
-        args.UiCodecEndpoint = codecEndpoint;
+        Args.UiCodecEndpoint = codecEndpoint;
         return this;
     }
 
@@ -129,9 +129,9 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="format"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithLogFormat(LogFormat format)
+    public TemporalServerResourceBuilder WithLogFormat(LogFormat format)
     {
-        args.LogFormat = format;
+        Args.LogFormat = format;
         return this;
     }
 
@@ -140,9 +140,9 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="level"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithLogLevel(LogLevel level)
+    public TemporalServerResourceBuilder WithLogLevel(LogLevel level)
     {
-        args.LogLevel = level;
+        Args.LogLevel = level;
         return this;
     }
 
@@ -151,9 +151,9 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="pragma"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithSQLitePragma(SQLitePragma pragma)
+    public TemporalServerResourceBuilder WithSQLitePragma(SQLitePragma pragma)
     {
-        args.SQLitePragma = pragma;
+        Args.SQLitePragma = pragma;
         return this;
     }
 
@@ -162,14 +162,11 @@ public class TemporalServerExecutableResourceBuilder
     /// </summary>
     /// <param name="ns"></param>
     /// <returns></returns>
-    public TemporalServerExecutableResourceBuilder WithNamespace(params string[] namespaces)
+    public TemporalServerResourceBuilder WithNamespace(params string[] namespaces)
     {
-        args.Namespaces.AddRange(namespaces);
+        Args.Namespaces.AddRange(namespaces);
         return this;
     }
 
-    public TemporalServerExecutableResourceArguments Build()
-    {
-        return args;
-    }
+    public TemporalServerResourceArguments Build() => Args;
 }

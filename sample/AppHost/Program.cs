@@ -2,8 +2,8 @@ using Aspire.Temporal.Server;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var temporal = builder.AddTemporalServerExecutable("temporal", x => x
-    .WithLogFormat(LogFormat.Pretty)
+var temporal = await builder.AddTemporalServerContainer("temporal", x => x
+    .WithLogFormat(LogFormat.Json)
     .WithLogLevel(LogLevel.Info)
     .WithNamespace("test1", "test2"));
 

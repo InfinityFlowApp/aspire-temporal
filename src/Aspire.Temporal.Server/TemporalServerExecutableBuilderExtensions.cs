@@ -1,8 +1,6 @@
-﻿using System.Net.Sockets;
+﻿namespace Aspire.Temporal.Server;
 
-namespace Aspire.Temporal.Server;
-
-public static class TemporalServerBuilderExtensions
+public static class TemporalServerExecutableBuilderExtensions
 {
     /// <summary>
     /// Adds a temporal server resource instance to the Aspire host. Requires the Temporal executable location to be in your path.
@@ -12,9 +10,9 @@ public static class TemporalServerBuilderExtensions
     /// <param name="callback"></param>
     /// <returns></returns>
     public static IResourceBuilder<TemporalServerExecutableResource> AddTemporalServerExecutable(this IDistributedApplicationBuilder builder, string name,
-        Action<TemporalServerExecutableResourceBuilder> callback)
+        Action<TemporalServerResourceBuilder> callback)
     {
-        var rb = new TemporalServerExecutableResourceBuilder();
+        var rb = new TemporalServerResourceBuilder();
         callback(rb);
         var args = rb.Build();
 
@@ -29,11 +27,11 @@ public static class TemporalServerBuilderExtensions
     /// <returns></returns>
     public static IResourceBuilder<TemporalServerExecutableResource> AddTemporalServerExecutable(this IDistributedApplicationBuilder builder, string name)
     {
-        return builder.AddTemporalServerExecutable(name, new TemporalServerExecutableResourceArguments());
+        return builder.AddTemporalServerExecutable(name, new TemporalServerResourceArguments());
     }
 
     private static IResourceBuilder<TemporalServerExecutableResource> AddTemporalServerExecutable(this IDistributedApplicationBuilder builder, string name,
-        TemporalServerExecutableResourceArguments args)
+        TemporalServerResourceArguments args)
     {
         var resourceBuilder = builder.AddResource(new TemporalServerExecutableResource(name, args));
 
