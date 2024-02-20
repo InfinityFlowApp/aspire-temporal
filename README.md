@@ -1,6 +1,7 @@
-# Temporal Dev Server Aspire Component
+# InfinityFlow Aspire.Temporal
 
-Aspire extension to start the temporal cli dev server as an executable resource
+
+Aspire extension to start the temporal cli dev server as an container or executable resource
 
 ## Contents:
 - [Pre-Requisites](#pre-requisites)
