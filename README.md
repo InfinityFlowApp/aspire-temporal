@@ -18,7 +18,7 @@ Aspire extension to start the temporal cli dev server as an executable resource
 ### 1. Install the nuget package
 
 ```sh
-dotnet add package sains1.Aspire.Temporal.Server
+dotnet add package Asspire.Temporal.Server
 ```
 
 ### 2. Add Temporal dev server to your Aspire AppHost Program.cs
