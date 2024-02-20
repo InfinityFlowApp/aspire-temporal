@@ -23,8 +23,8 @@
     <ItemGroup>
         <!-- Assets -->
         <None Pack="true" PackagePath="" Include="assets/packageIcon.png" />
-        <None Pack="true" PackagePath="" Include="$(SolutionDir)/README.md" Link="assets/README.md" />
-        <None Pack="true" PackagePath="" Include="$(SolutionDir)/LICENSE" Link="assets/LICENSE" />
+        <None Pack="true" PackagePath="" Include="assets/README.md" />
+        <None Pack="true" PackagePath="" Include="assets/LICENSE" />
  
     </ItemGroup>
   <ItemGroup>
