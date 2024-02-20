@@ -61,8 +61,8 @@ public static class TemporalServerContainerBuilderExtensions
 
     EXPOSE 7233
     EXPOSE 8233
-    EXPOSE 9000
-    EXPOSE 8080
+    EXPOSE 7235
+    EXPOSE 7234
 
     # Set the entrypoint to the downloaded binary
     ENTRYPOINT ["/temporal"]
@@ -87,12 +87,12 @@ public static class TemporalServerContainerBuilderExtensions
 
         if (args.MetricsPort is not null)
         {
-            resourceBuilder.WithHttpEndpoint(name: "metrics", hostPort: args.MetricsPort, containerPort: 9000); // Internal port is always 9000
+            resourceBuilder.WithHttpEndpoint(name: "metrics", hostPort: args.MetricsPort, containerPort: 7235); // Internal port is always 7235
         }
 
         if (args.HttpPort is not null)
         {
-            resourceBuilder.WithHttpEndpoint(name: "http", hostPort: args.HttpPort, containerPort: 8080); // Internal port is always 8080
+            resourceBuilder.WithHttpEndpoint(name: "http", hostPort: args.HttpPort, containerPort: 7234); // Internal port is always 7234
         }
 
         return resourceBuilder;
