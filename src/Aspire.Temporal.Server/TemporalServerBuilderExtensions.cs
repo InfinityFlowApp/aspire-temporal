@@ -1,5 +1,7 @@
 ﻿using System.Net.Sockets;
 
+using Aspire.Hosting;
+
 namespace Aspire.Temporal.Server;
 
 public static class TemporalServerBuilderExtensions
@@ -35,28 +37,23 @@ public static class TemporalServerBuilderExtensions
     private static IResourceBuilder<TemporalServerExecutableResource> AddTemporalServerExecutable(this IDistributedApplicationBuilder builder, string name,
         TemporalServerExecutableResourceArguments args)
     {
-        const int DefaultPort = 7233;
+        var resourceBuilder = builder.AddResource(new TemporalServerExecutableResource(name, args));
 
-        var port = args.Port ?? DefaultPort;
-        var uiPort = args.UiPort ?? port + 1000;
-
-        var resourceBuilder = builder.AddResource(new TemporalServerExecutableResource(name, args))
-            .WithAnnotation(new ServiceBindingAnnotation(protocol: ProtocolType.Tcp, name: "server", uriScheme: "http", port: port, isExternal: true));
-
+        resourceBuilder.WithHttpEndpoint(containerPort: args.Port-1, hostPort: args.Port, name: "server").AsHttp2Service();
 
         if (args.Headless is not true)
         {
-            resourceBuilder.WithAnnotation(new ServiceBindingAnnotation(protocol: ProtocolType.Tcp, name: "ui", uriScheme: "http", port: uiPort, isExternal: true));
+            resourceBuilder.WithHttpEndpoint(containerPort: args.UiPort.GetValueOrDefault(8080)-1, hostPort: args.UiPort ?? args.Port + 1000, name: "ui");
         }
 
         if (args.MetricsPort is not null)
         {
-            resourceBuilder.WithAnnotation(new ServiceBindingAnnotation(protocol: ProtocolType.Tcp, name: "metrics", uriScheme: "http", port: args.MetricsPort, isExternal: true));
+            resourceBuilder.WithHttpEndpoint(hostPort: args.MetricsPort?? 9000, name: "metrics");
         }
 
         if (args.HttpPort is not null)
         {
-            resourceBuilder.WithAnnotation(new ServiceBindingAnnotation(protocol: ProtocolType.Tcp, name: "http", uriScheme: "http", port: args.HttpPort, isExternal: true));
+            resourceBuilder.WithHttpEndpoint(hostPort: args.HttpPort ?? 8080, name: "http");
         }
 
         return resourceBuilder;

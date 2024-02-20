@@ -2,7 +2,18 @@
 
 public class TemporalServerExecutableResourceBuilder
 {
-    private readonly TemporalServerExecutableResourceArguments args = new TemporalServerExecutableResourceArguments();
+    private readonly TemporalServerExecutableResourceArguments args = new();
+
+    /// <summary>
+    /// Command to execute (default: "temporal")
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
+    public TemporalServerExecutableResourceBuilder WithCommand(string command = "temporal")
+    {
+        args.Command = command;
+        return this;
+    }
 
     /// <summary>
     /// File in which to persist Temporal state (by default, Workflows are lost when the process dies)
@@ -24,7 +35,6 @@ public class TemporalServerExecutableResourceBuilder
         args.Port = port;
         return this;
     }
-
 
     /// <summary>
     /// Port for the frontend HTTP service (default: disabled)

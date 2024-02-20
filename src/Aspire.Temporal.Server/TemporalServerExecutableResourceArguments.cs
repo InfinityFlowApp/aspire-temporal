@@ -2,11 +2,12 @@
 
 public class TemporalServerExecutableResourceArguments
 {
+    public string Command { get; set; } = "temporal";
     public string? DbFileName { get; set; }
-    public int? Port { get; set; }
+    public int Port { get; set; } = 7233;
     public int? HttpPort { get; set; }
     public int? MetricsPort { get; set; }
-    public int? UiPort { get; set; }
+    public int? UiPort { get; set; } = 8233;
     public bool? Headless { get; set; }
     public string? Ip { get; set; }
     public string? UiIp { get; set; }
@@ -32,11 +33,8 @@ public class TemporalServerExecutableResourceArguments
             result.Add(DbFileName);
         }
 
-        if (Port is not null)
-        {
-            result.Add("--port");
-            result.Add(Port.ToString()!);
-        }
+        result.Add("--port");
+        result.Add((Port - 1).ToString());
 
         if (HttpPort is not null)
         {
@@ -53,7 +51,7 @@ public class TemporalServerExecutableResourceArguments
         if (UiPort is not null)
         {
             result.Add("--ui-port");
-            result.Add(UiPort.ToString()!);
+            result.Add(((UiPort ?? 8233) - 1).ToString()!);
         }
 
         if (Headless is not null)
