@@ -1,0 +1,43 @@
+name-template: "InfinityFlow Aspire Temporal $RESOLVED_VERSION"
+tag-template: "InfinityFlow.Aspire.Temporal.$RESOLVED_VERSION"
+change-template: "- $TITLE by @$AUTHOR (#$NUMBER)"
+no-changes-template: "- No changes"
+categories:
+  - title: "📚 Documentation"
+    labels:
+      - "documentation"
+  - title: "🚀 New Features"
+    labels:
+      - "enhancement"
+  - title: "🐛 Bug Fixes"
+    labels:
+      - "bug"
+  - title: "☸️ Deployment Resources"
+    labels:
+      - "deployment-resources"
+version-resolver:
+  major:
+    labels:
+      - "major"
+  minor:
+    labels:
+      - "minor"
+  patch:
+    labels:
+      - "patch"
+  default: patch
+template: |
+  $CHANGES
+
+  ## 👨🏼‍💻 Contributors
+
+  $CONTRIBUTORS
+autolabeler:
+  - label: "documentation"
+    files:
+      - "docs/**/*"
+  - label: "maintenance"
+    files:
+      - ".github/**/*"
+      - ".devcontainer/**/*"
+      - "test/**/*"

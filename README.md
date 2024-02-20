@@ -1,11 +1,12 @@
-# Temporal Dev Server Aspire Component
+# InfinityFlow.Aspire.Temporal
 
- [![NuGet](https://img.shields.io/nuget/v/InfinityFlow.Aspire.Temporal.svg?style=flat)](http://www.nuget.org/profiles/InfinityFlow)
+[![NuGet](https://img.shields.io/nuget/v/InfinityFlow.Aspire.Temporal.svg?style=flat)](http://www.nuget.org/profiles/InfinityFlow)
  
- [![Discord](https://discordapp.com/api/guilds/1148334798524383292/widget.png?style=banner2)](https://discord.gg/PXJFbP7PKk)
+[![Discord](https://discordapp.com/api/guilds/1148334798524383292/widget.png?style=banner2)](https://discord.gg/PXJFbP7PKk)
 
 Aspire extension to start the temporal cli dev server as an container or executable resource. 
 **Note: Only container works as expected. See https://github.com/dotnet/aspire/issues/1637 and https://github.com/temporalio/cli/issues/316**
+
 
 ## Contents:
 - [Pre-Requisites](#pre-requisites)
@@ -23,7 +24,7 @@ Aspire extension to start the temporal cli dev server as an container or executa
 ### 1. Install the nuget package
 
 ```sh
-dotnet add package Asspire.Temporal.Server
+dotnet add package InfinityFlow.Aspire.Temporal
 ```
 
 ### 2. Add Temporal dev server to your Aspire AppHost Program.cs
