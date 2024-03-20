@@ -31,6 +31,6 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
     <PackageReference Include="Aspire.Hosting" Version="8.0.0-preview.4.24156.9" />
     <PackageReference Include="Docker.DotNet" Version="3.125.15" />
-    <PackageReference Include="Testcontainers" Version="3.7.0" />
+    <PackageReference Include="Testcontainers" Version="3.8.0" />
   </ItemGroup>
 </Project>
