@@ -36,7 +36,7 @@ jobs:
         run: dotnet pack ${{ env.TargetProject }} --configuration Release --output ${{ env.NuGetDirectory }}
 
       - name: store artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nuget
           if-no-files-found: error
