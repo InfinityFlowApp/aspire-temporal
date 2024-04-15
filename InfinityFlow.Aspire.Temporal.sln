@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{70F8209F-4A6
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InfinityFlow.Aspire.Temporal", "src\InfinityFlow.Aspire.Temporal\InfinityFlow.Aspire.Temporal.csproj", "{88EE3FBD-5AF8-4F75-A0C7-BC593EC8F90F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "Sample\Api\Api.csproj", "{1FFA9DCE-3368-4AFA-960A-0AD2C501CA1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Api", "sample\Api\Api.csproj", "{1FFA9DCE-3368-4AFA-960A-0AD2C501CA1B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Worker", "sample\Worker\Worker.csproj", "{8B68A40A-674D-4989-B366-1EE0A633F0D9}"
 EndProject
