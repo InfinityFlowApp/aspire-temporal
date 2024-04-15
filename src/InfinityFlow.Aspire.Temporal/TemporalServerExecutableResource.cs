@@ -1,35 +1,43 @@
 ﻿using InfinityFlow.Aspire.Temporal;
+using Aspire.Hosting.ApplicationModel;
+
 
 namespace Aspire.Hosting;
 
-public class TemporalServerExecutableResource(string name, TemporalServerResourceArguments arguments) : ExecutableResource(name, command: "temporal", workingDirectory: "", args: arguments.GetArgs()), IResourceWithConnectionString
+public class TemporalServerExecutableResource(string name, TemporalServerResourceArguments arguments) : ExecutableResource(name, command: "temporal", workingDirectory: ""), IResourceWithConnectionString
 {
+    public ReferenceExpression ConnectionStringExpression => ReferenceExpression.Create($"{GetConnectionString()}");
+
     public string? GetConnectionString()
     {
-        if (!this.TryGetAllocatedEndPoints(out var endpoints))
+        var endpoints = this.GetEndpoints().Where(e => e.IsAllocated).ToList();
+        if (endpoints.Count==0)
         {
             throw new DistributedApplicationException("Expected allocated endpoints!");
         }
 
-        var server = endpoints.Single(x => x.Name == "server");
+        var server = endpoints.SingleOrDefault(x => x.EndpointName == "server");
 
-        return server.EndPointString;
+        return server?.Url;
     }
 }
 
 public class TemporalServerContainerResource(string name, TemporalServerResourceArguments arguments) : ContainerResource(name,entrypoint: "/temporal"), IResourceWithConnectionString, IResourceWithEnvironment
 {
+    public ReferenceExpression ConnectionStringExpression => ReferenceExpression.Create($"{GetConnectionString()}");
+
     public TemporalServerResourceArguments Arguments { get; } = arguments;
 
     public string? GetConnectionString()
     {
-        if (!this.TryGetAllocatedEndPoints(out var endpoints))
+        var endpoints = this.GetEndpoints().Where(e => e.IsAllocated).ToList();
+        if (endpoints.Count == 0)
         {
             throw new DistributedApplicationException("Expected allocated endpoints!");
         }
 
-        var server = endpoints.Single(x => x.Name == "server");
+        var server = endpoints.SingleOrDefault(x => x.EndpointName == "server");
 
-        return server.EndPointString;
+        return server?.Url;
     }
 }

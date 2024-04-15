@@ -28,7 +28,7 @@ public static class Extensions
             http.AddStandardResilienceHandler();
 
             // Turn on service discovery by default
-            http.UseServiceDiscovery();
+            http.AddServiceDiscovery();
         });
 
         return builder;
@@ -43,12 +43,9 @@ public static class Extensions
         });
 
         builder.Services.AddOpenTelemetry()
-            .WithMetrics(metrics =>
-            {
-                metrics.AddRuntimeInstrumentation()
+            .WithMetrics(metrics => metrics.AddRuntimeInstrumentation()
                        .AddBuiltInMeters()
-                       .AddMeter("Temporal.Client");
-            })
+                       .AddMeter("Temporal.Client"))
             .WithTracing(tracing =>
             {
                 if (builder.Environment.IsDevelopment())

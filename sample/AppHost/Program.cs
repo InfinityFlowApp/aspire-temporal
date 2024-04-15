@@ -1,3 +1,5 @@
+using Aspire.Hosting;
+
 using InfinityFlow.Aspire.Temporal;
 
 var builder = DistributedApplication.CreateBuilder(args);
