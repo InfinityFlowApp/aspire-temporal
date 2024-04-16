@@ -1,4 +1,6 @@
-﻿using InfinityFlow.Aspire.Temporal;
+﻿using Aspire.Hosting.ApplicationModel;
+
+using InfinityFlow.Aspire.Temporal;
 
 namespace Aspire.Hosting;
 public static class TemporalServerExecutableBuilderExtensions
@@ -36,21 +38,21 @@ public static class TemporalServerExecutableBuilderExtensions
     {
         var resourceBuilder = builder.AddResource(new TemporalServerExecutableResource(name, args));
 
-        resourceBuilder.WithHttpEndpoint(hostPort: args.Port, name: "server").AsHttp2Service();
+        resourceBuilder.WithHttpEndpoint(port: args.Port, name: "server").AsHttp2Service();
 
         if (args.Headless is not true)
         {
-            resourceBuilder.WithHttpEndpoint(hostPort: args.UiPort ?? args.Port + 1000, name: "ui");
+            resourceBuilder.WithHttpEndpoint(port: args.UiPort ?? args.Port + 1000, name: "ui");
         }
 
         if (args.MetricsPort is not null)
         {
-            resourceBuilder.WithHttpEndpoint(hostPort: args.MetricsPort?? 9000, name: "metrics");
+            resourceBuilder.WithHttpEndpoint(port: args.MetricsPort?? 9000, name: "metrics");
         }
 
         if (args.HttpPort is not null)
         {
-            resourceBuilder.WithHttpEndpoint(hostPort: args.HttpPort ?? 8080, name: "http");
+            resourceBuilder.WithHttpEndpoint(port: args.HttpPort ?? 8080, name: "http");
         }
 
         return resourceBuilder;

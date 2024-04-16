@@ -1,5 +1,5 @@
-﻿using DotNet.Testcontainers.Builders;
-
+﻿using Aspire.Hosting.ApplicationModel;
+using DotNet.Testcontainers.Builders;
 using InfinityFlow.Aspire.Temporal;
 
 namespace Aspire.Hosting;
@@ -78,21 +78,21 @@ public static class TemporalServerContainerBuilderExtensions
         var resourceBuilder = builder.AddResource(container)
                 .WithAnnotation(new ContainerImageAnnotation() { Image = "aspire-temporal-server-helper", Tag = "latest" })
                 .WithArgs(args.GetArgs())
-                .WithHttpEndpoint(name: "server", hostPort: args.Port, containerPort: 7233).AsHttp2Service(); // Internal port is always 7233
+                .WithHttpsEndpoint(name: "server", targetPort: args.Port, port: 7233).AsHttp2Service(); // Internal port is always 7233
 
         if (args.Headless is not true)
         {
-            resourceBuilder.WithHttpEndpoint(name: "ui", hostPort: args.UiPort, containerPort: 8233); // Internal port is always 8233
+            resourceBuilder.WithHttpEndpoint(name: "ui", targetPort: args.UiPort, port: 8233); // Internal port is always 8233
         }
 
         if (args.MetricsPort is not null)
         {
-            resourceBuilder.WithHttpEndpoint(name: "metrics", hostPort: args.MetricsPort, containerPort: 7235); // Internal port is always 7235
+            resourceBuilder.WithHttpEndpoint(name: "metrics", targetPort: args.MetricsPort, port: 7235); // Internal port is always 7235
         }
 
         if (args.HttpPort is not null)
         {
-            resourceBuilder.WithHttpEndpoint(name: "http", hostPort: args.HttpPort, containerPort: 7234); // Internal port is always 7234
+            resourceBuilder.WithHttpEndpoint(name: "http", targetPort: args.HttpPort, port: 7234); // Internal port is always 7234
         }
 
         return resourceBuilder;
