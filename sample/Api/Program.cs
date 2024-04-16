@@ -26,7 +26,7 @@ builder.Services.AddTemporalClient(opts =>
 {
     opts.TargetHost = builder.Configuration["ConnectionStrings:temporal"];
     opts.Namespace = Constants.Namespace;
-    opts.Interceptors = new[] { new TracingInterceptor() };
+    opts.Interceptors = [new TracingInterceptor()];
     opts.Runtime = runtime;
 });
 
