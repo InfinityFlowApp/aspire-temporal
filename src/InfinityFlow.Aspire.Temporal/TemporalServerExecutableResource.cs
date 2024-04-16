@@ -18,7 +18,7 @@ public class TemporalServerExecutableResource(string name, TemporalServerResourc
 
         var server = endpoints.SingleOrDefault(x => x.EndpointName == "server");
 
-        return server?.Url;
+        return $"{server?.Host}:{server?.Port}";
     }
 }
 
@@ -38,6 +38,6 @@ public class TemporalServerContainerResource(string name, TemporalServerResource
 
         var server = endpoints.SingleOrDefault(x => x.EndpointName == "server");
 
-        return server?.Url;
+        return $"{server?.Host}:{server?.Port}";
     }
 }

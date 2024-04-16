@@ -78,7 +78,7 @@ public static class TemporalServerContainerBuilderExtensions
         var resourceBuilder = builder.AddResource(container)
                 .WithAnnotation(new ContainerImageAnnotation() { Image = "aspire-temporal-server-helper", Tag = "latest" })
                 .WithArgs(args.GetArgs())
-                .WithHttpEndpoint(name: "server", targetPort: args.Port, port: 7233).AsHttp2Service(); // Internal port is always 7233
+                .WithHttpsEndpoint(name: "server", targetPort: args.Port, port: 7233).AsHttp2Service(); // Internal port is always 7233
 
         if (args.Headless is not true)
         {
