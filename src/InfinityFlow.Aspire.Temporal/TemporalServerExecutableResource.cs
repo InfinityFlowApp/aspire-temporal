@@ -13,7 +13,7 @@ public class TemporalServerExecutableResource(string name, TemporalServerResourc
         var endpoints = this.GetEndpoints().Where(e => e.IsAllocated).ToList();
         if (endpoints.Count==0)
         {
-            throw new DistributedApplicationException("Expected allocated endpoints!");
+            return null;
         }
 
         var server = endpoints.SingleOrDefault(x => x.EndpointName == "server");
@@ -33,7 +33,7 @@ public class TemporalServerContainerResource(string name, TemporalServerResource
         var endpoints = this.GetEndpoints().Where(e => e.IsAllocated).ToList();
         if (endpoints.Count == 0)
         {
-            throw new DistributedApplicationException("Expected allocated endpoints!");
+            return null;
         }
 
         var server = endpoints.SingleOrDefault(x => x.EndpointName == "server");
