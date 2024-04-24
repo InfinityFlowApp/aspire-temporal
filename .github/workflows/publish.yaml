@@ -33,8 +33,14 @@ jobs:
         uses: actions/setup-dotnet@v4
 
       - name: dotnet pack
+        if:  ${{ github.event_name != 'release'  }}
         run: dotnet pack ${{ env.TargetProject }} --configuration Release -p:PackageVersion="${{ github.event.release.tag_name || github.ref_name }}" --output ${{ env.NuGetDirectory }}
 
+      - name: dotnet pack (release)
+        if:  ${{ github.event_name == 'release'  && github.ref_type == 'tag' || github.event.release.tag_name }}
+        run: dotnet pack ${{ env.TargetProject }} --configuration Release -p:PackageVersion="${{ github.event.release.tag_name || github.ref_name }}" --output ${{ env.NuGetDirectory }}
+
+      
       - name: store artifact
         uses: actions/upload-artifact@v4
         with:
