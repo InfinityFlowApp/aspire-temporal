@@ -1,5 +1,5 @@
-name-template: "InfinityFlow Aspire Temporal $RESOLVED_VERSION"
-tag-template: "v$RESOLVED_VERSION"
+name-template: "InfinityFlow.Aspire.Temporal $RESOLVED_VERSION"
+tag-template: "$RESOLVED_VERSION"
 change-template: "- $TITLE by @$AUTHOR (#$NUMBER)"
 no-changes-template: "- No changes"
 categories:
