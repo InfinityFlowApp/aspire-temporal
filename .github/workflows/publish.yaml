@@ -19,9 +19,6 @@ env:
 defaults:
   run:
     shell: pwsh
-concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref_type != 'tag' }}
 
 jobs:
   create_nuget:
@@ -36,7 +33,7 @@ jobs:
         uses: actions/setup-dotnet@v4
 
       - name: dotnet pack
-        run: dotnet pack ${{ env.TargetProject }} --configuration Release --output ${{ env.NuGetDirectory }}
+        run: dotnet pack ${{ env.TargetProject }} --configuration Release -p:PackageVersion="${{ github.event.release.tag_name || github.ref_name }}" --output ${{ env.NuGetDirectory }}
 
       - name: store artifact
         uses: actions/upload-artifact@v4
