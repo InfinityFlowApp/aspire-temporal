@@ -94,7 +94,7 @@ public class TemporalServerResourceBuilder
     }
 
     /// <summary>
-    /// IPv4 address to bind the Web UI to (default: same as --ip)   
+    /// IPv4 address to bind the Web UI to (default: same as --ip)
     /// </summary>
     /// <param name="uiIp"></param>
     /// <returns></returns>
@@ -105,7 +105,7 @@ public class TemporalServerResourceBuilder
     }
 
     /// <summary>
-    /// UI custom assets path 
+    /// UI custom assets path
     /// </summary>
     /// <param name="assetsPath"></param>
     /// <returns></returns>
@@ -171,4 +171,16 @@ public class TemporalServerResourceBuilder
     }
 
     public TemporalServerResourceArguments Build() => Args;
+
+    /// <summary>
+    /// Specify dynamic config values that should be configured.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public TemporalServerResourceBuilder WithDynamicConfigValue(string key, object value)
+    {
+        Args.DynamicConfigValues.Add(key, value);
+        return this;
+    }
 }

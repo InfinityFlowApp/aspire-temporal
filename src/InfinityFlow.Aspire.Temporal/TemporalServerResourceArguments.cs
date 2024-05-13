@@ -81,6 +81,11 @@ public class TemporalServerResourceArguments
     public List<string> Namespaces { get; set; } = [];
 
     /// <summary>
+    /// Gets the list of dynamic config values.
+    /// </summary>
+    public Dictionary<string, object> DynamicConfigValues { get; set; } = [];
+
+    /// <summary>
     /// Converts the current instance's properties to an array of command-line arguments for starting the Temporal server.
     /// </summary>
     /// <returns>An array of strings representing the command-line arguments.</returns>
@@ -126,6 +131,22 @@ public class TemporalServerResourceArguments
         {
             result.Add("--namespace");
             result.Add(name);
+        }
+
+        foreach (var (k, v) in DynamicConfigValues)
+        {
+            result.Add("--dynamic-config-value");
+
+            result.Add($"{k}={v switch
+            {
+                string s => $""" "{v}" """,
+                bool b => b.ToString().ToLowerInvariant(),
+                int i => i.ToString(),
+                float f => f.ToString("F"),
+                double d => d.ToString("F"),
+                long l => l.ToString(),
+                _ => null,
+            }}");
         }
 
         return [.. result];
