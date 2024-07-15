@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Temporalio" Version="1.1.1" />
+    <PackageReference Include="Temporalio" Version="1.1.2" />
     <PackageReference Include="Temporalio.Extensions.Hosting" Version="1.1.1" />
   </ItemGroup>
 
