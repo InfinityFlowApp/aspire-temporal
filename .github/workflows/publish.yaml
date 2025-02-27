@@ -31,7 +31,8 @@ jobs:
 
       - name: install dotnet
         uses: actions/setup-dotnet@v4
-
+        with:
+          dotnet-version: 9.0.x
       - name: dotnet pack
         if:  ${{ github.event_name != 'release'  }}
         run: dotnet pack ${{ env.TargetProject }} --configuration Release --output ${{ env.NuGetDirectory }}
