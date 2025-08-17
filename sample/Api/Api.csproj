@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Temporalio" Version="1.6.0" />
-    <PackageReference Include="Temporalio.Extensions.Hosting" Version="1.5.0" />
+    <PackageReference Include="Temporalio.Extensions.Hosting" Version="1.6.0" />
   </ItemGroup>
 
   <ItemGroup>
