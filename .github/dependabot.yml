@@ -17,24 +17,15 @@ updates:
       - "dependencies"
     open-pull-requests-limit: 10
     groups:
-      aspire:
-        patterns:
-          - "Aspire"
-          - "Aspire.*"
       dotnet:
         patterns:
           - "Microsoft.*"
           - "System.*"
+          - "Aspire"
+          - "Aspire.*"
       OpenTelemetry:
         patterns:
           - "OpenTelemetry.*"
-  - package-ecosystem: "gitsubmodule" # See documentation for possible values
-    directory: "/" # Location of package manifests
-    schedule:
-      interval: "daily"
-    labels:
-      - "dependencies"
-    open-pull-requests-limit: 10
   - package-ecosystem: "devcontainers"
     directory: "/.devcontainer" # Location of package manifests
     schedule:
