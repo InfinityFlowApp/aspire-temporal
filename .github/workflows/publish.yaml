@@ -30,7 +30,7 @@ jobs:
           fetch-depth: 0
 
       - name: install dotnet
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 9.0.x
       - name: dotnet pack
@@ -62,7 +62,7 @@ jobs:
           path: ${{ env.NuGetDirectory }}
 
       - name: install dotnet
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
 
       - name: nuget push
         run: |
