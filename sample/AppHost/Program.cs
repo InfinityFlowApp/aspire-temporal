@@ -25,5 +25,4 @@ builder.AddProject<Projects.Worker>("worker")
     .WithReference(temporal);
 
 
-
 builder.Build().Run();
