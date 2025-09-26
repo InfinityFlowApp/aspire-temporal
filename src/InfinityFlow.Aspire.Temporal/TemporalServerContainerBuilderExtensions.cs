@@ -40,21 +40,21 @@ public static class TemporalServerContainerBuilderExtensions
                 .WithAnnotation(new ContainerImageAnnotation() { Image = "temporalio/admin-tools", Tag = "latest" })
                 .WithArgs(args.GetArgs())
                 .WithEntrypoint("temporal")
-                .WithHttpsEndpoint(name: "server", port: args.Port, targetPort: 7233).AsHttp2Service(); // Internal port is always 7233
+                .WithHttpsEndpoint(name: "server", port: args.Port, targetPort: args.Port).AsHttp2Service(); // Internal port is always 7233
 
         if (args.Headless is not true)
         {
-            resourceBuilder.WithHttpEndpoint(name: "ui", port: args.UiPort, targetPort: 8233); // Internal port is always 8233
+            resourceBuilder.WithHttpEndpoint(name: "ui", port: args.UiPort, targetPort: args.UiPort); // Internal port is always 8233
         }
 
         if (args.MetricsPort is not null)
         {
-            resourceBuilder.WithHttpEndpoint(name: "metrics", port: args.MetricsPort, targetPort: 7235); // Internal port is always 7235
+            resourceBuilder.WithHttpEndpoint(name: "metrics", port: args.MetricsPort, targetPort: args.MetricsPort); // Internal port is always 7235
         }
 
         if (args.HttpPort is not null)
         {
-            resourceBuilder.WithHttpEndpoint(name: "http", port: args.HttpPort, targetPort: 7234); // Internal port is always 7234
+            resourceBuilder.WithHttpEndpoint(name: "http", port: args.HttpPort, targetPort: args.HttpPort); // Internal port is always 7234
         }
 
         return resourceBuilder;
