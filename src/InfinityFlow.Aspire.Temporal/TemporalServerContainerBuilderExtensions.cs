@@ -12,7 +12,7 @@ public static class TemporalServerContainerBuilderExtensions
     /// <param name="name"></param>
     /// <param name="callback"></param>
     /// <returns></returns>
-    public static Task<IResourceBuilder<TemporalServerContainerResource>> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name,
+    public static IResourceBuilder<TemporalServerContainerResource> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name,
         Action<TemporalServerResourceBuilder> callback)
     {
         var rb = new TemporalServerResourceBuilder();
@@ -28,11 +28,11 @@ public static class TemporalServerContainerBuilderExtensions
     /// <param name="builder"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    public static Task<IResourceBuilder<TemporalServerContainerResource>> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name)
+    public static IResourceBuilder<TemporalServerContainerResource> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name)
     {
         return builder.AddTemporalServerContainer(name, new TemporalServerResourceArguments());
     }
-    private static async Task<IResourceBuilder<TemporalServerContainerResource>> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name, TemporalServerResourceArguments args)
+    private static IResourceBuilder<TemporalServerContainerResource> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name, TemporalServerResourceArguments args)
     {
         var container = new TemporalServerContainerResource(name, args);
 
