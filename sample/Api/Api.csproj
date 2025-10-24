@@ -13,6 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.10.0" />
+  <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="9.5.2" />
     <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
     <ProjectReference Include="..\Worker\Worker.csproj" />
   </ItemGroup>
