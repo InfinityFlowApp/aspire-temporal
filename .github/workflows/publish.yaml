@@ -43,7 +43,7 @@ jobs:
 
       
       - name: store artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: nuget
           if-no-files-found: error
