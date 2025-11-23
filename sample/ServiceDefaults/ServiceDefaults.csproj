@@ -20,7 +20,8 @@
     <PackageReference Include="Temporalio.Extensions.DiagnosticSource" Version="1.9.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
-    <PackageReference Include="Temporalio.Extensions.OpenTelemetry" Version="1.7.0" />
+    <PackageReference Include="Temporalio.Extensions.DiagnosticSource" Version="1.9.0" />
+    <PackageReference Include="Temporalio.Extensions.OpenTelemetry" Version="1.9.0" />
   </ItemGroup>
 
 </Project>
