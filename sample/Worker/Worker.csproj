@@ -11,8 +11,6 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
     <PackageReference Include="Temporalio" Version="1.9.0" />
     <PackageReference Include="Temporalio.Extensions.Hosting" Version="1.9.0" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ServiceDefaults\ServiceDefaults.csproj" />
   </ItemGroup>
