@@ -42,7 +42,8 @@ public static class TemporalServerExecutableBuilderExtensions
     private static IResourceBuilder<TemporalServerExecutableResource> AddTemporalServerExecutable(this IDistributedApplicationBuilder builder, string name,
         TemporalServerResourceArguments args)
     {
-        var resourceBuilder = builder.AddResource(new TemporalServerExecutableResource(name, args));
+        var resourceBuilder = builder.AddResource(new TemporalServerExecutableResource(name, args))
+            .WithArgs(args.GetArgs());
 
         resourceBuilder.WithHttpEndpoint(port: args.Port, name: "server").AsHttp2Service();
 
