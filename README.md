@@ -50,9 +50,24 @@ var temporal = await builder.AddTemporalServerContainer("temporal", x => x
 
 You should see Temporal running under the Executables tab.
 
-Temporal will be available on its default ports:
-- Server: http://localhost:7233
-- UI: http://localhost:8233
+**Dynamic Port Allocation (Default)**:
+By default, Aspire automatically assigns random available ports to avoid conflicts.
+This is especially useful for:
+- Running multiple Temporal instances simultaneously
+- Parallel test execution
+- CI/CD environments where port conflicts are common
+
+You can view the allocated ports in the Aspire dashboard. For example:
+- Server: http://localhost:54321 (dynamically allocated)
+- UI: http://localhost:54322 (dynamically allocated)
+
+**Fixed Ports (Optional)**:
+If you need consistent port numbers, explicitly specify them:
+```csharp
+var temporal = builder.AddTemporalServerContainer("temporal", x => x
+    .WithPort(7233)      // Server on http://localhost:7233
+    .WithUiPort(8233));  // UI on http://localhost:8233
+```
 
 ![Aspire dashboard temporal exe](./docs/aspire-dashboard-exe.png)
 
@@ -82,7 +97,8 @@ If using [Temporalio.Extensions.Hosting](https://github.com/temporalio/sdk-dotne
 builder.Services
     .AddTemporalClient(opts =>
     {
-        opts.TargetHost = builder.Configuration["ConnectionStrings:temporal"]; // or just self-configure localhost:7233
+        // Connection string automatically resolves to the dynamically allocated server endpoint
+        opts.TargetHost = builder.Configuration.GetConnectionString("temporal");
         opts.Namespace = "default";
     })
 
@@ -92,7 +108,8 @@ builder.Services
 builder.Services
     .AddTemporalClient(opts =>
     {
-        opts.TargetHost = builder.Configuration["ConnectionStrings:temporal"]; // or just self-configure localhost:7233
+        // Connection string automatically resolves to the dynamically allocated server endpoint
+        opts.TargetHost = builder.Configuration.GetConnectionString("temporal");
         opts.Namespace = "default";
     })
     .AddHostedTemporalWorker("my-task-queue")
@@ -126,7 +143,9 @@ If done correctly, you should tracing and metrics on the Aspire dashboard:
 The dev server can be configured with a fluent builder
 
 ```csharp
-await builder.AddTemporalServerContainer("temporal", builder => builder.WithPort(1234))
+var temporal = builder.AddTemporalServerContainer("temporal", builder => builder
+    .WithPort(7233)          // Optional: specify fixed port (default: dynamic allocation)
+    .WithLogFormat(LogFormat.Json))
 ```
 
 You can run `temporal server start-dev --help` to get more information about the CLI flags on the dev server. All available flags are mapped to a method on the builder.
@@ -137,11 +156,11 @@ Available methods:
 builder
     .WithDbFileName("/location/of/persistent/file") // --db-filename
     .WithNamespace("namespace-name", ...)           // --namespace
-    .WithPort(7233)                                 // --port
-    .WithHttpPort(7234)                             // --http-port
-    .WithMetricsPort(7235)                          // --metrics-port
-    .UiPort(8233)                                   // --ui-port
-    .WithHeadlessUi(true)                           // --headless
+    .WithPort(7233)                                 // --port (optional: null = dynamic allocation)
+    .WithHttpPort(7234)                             // --http-port (optional: null = disabled)
+    .WithMetricsPort(7235)                          // --metrics-port (optional: null = disabled)
+    .WithUiPort(8233)                               // --ui-port (optional: null = dynamic allocation)
+    .WithHeadlessUi(true)                           // --headless (disables UI)
     .WithIp("127.0.0.1")                            // --ip
     .WithUiIp("127.0.0.1")                          // --ui-ip
     .WithUiAssetPath("/location/of/custom/assets")  // --ui-asset-path
@@ -150,3 +169,41 @@ builder
     .WithLogLevel(LogLevel.Info)                    // --log-level
     .WithSQLitePragma(SQLitePragma.JournalMode)     // --sqlite-pragma
 ```
+
+### Port Allocation Behavior
+
+**Dynamic Allocation (Recommended)**:
+- Don't specify `.WithPort()` or `.WithUiPort()` - Aspire will allocate random available ports
+- Best for development, testing, and CI/CD environments
+- Eliminates port conflicts when running multiple instances
+
+**Fixed Ports**:
+- Explicitly call `.WithPort(7233)` to use a specific port
+- Use when external tools or scripts depend on consistent port numbers
+- May cause conflicts if multiple instances run simultaneously
+
+## Breaking Changes in v1.0
+
+**Port allocation behavior has changed**:
+
+**v0.x (old)**:
+```csharp
+var temporal = builder.AddTemporalServerContainer("temporal");
+// Resulted in fixed ports: localhost:7233, localhost:8233
+```
+
+**v1.0 (new)**:
+```csharp
+var temporal = builder.AddTemporalServerContainer("temporal");
+// Results in dynamic ports: localhost:54321, localhost:54322 (random)
+```
+
+**Migration**:
+To maintain the old behavior with fixed ports, explicitly specify them:
+```csharp
+var temporal = builder.AddTemporalServerContainer("temporal", x => x
+    .WithPort(7233)      // Server on fixed port 7233
+    .WithUiPort(8233));  // UI on fixed port 8233
+```
+
+This change follows standard [Aspire networking patterns](https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/networking-overview) and eliminates port conflicts in multi-instance scenarios.

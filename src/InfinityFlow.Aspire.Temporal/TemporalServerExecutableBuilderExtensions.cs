@@ -42,17 +42,17 @@ public static class TemporalServerExecutableBuilderExtensions
 
         if (args.Headless is not true)
         {
-            resourceBuilder.WithHttpEndpoint(port: args.UiPort ?? args.Port + 1000, name: "ui");
+            resourceBuilder.WithHttpEndpoint(port: args.UiPort, name: "ui");
         }
 
         if (args.MetricsPort is not null)
         {
-            resourceBuilder.WithHttpEndpoint(port: args.MetricsPort?? 9000, name: "metrics");
+            resourceBuilder.WithHttpEndpoint(port: args.MetricsPort, name: "metrics");
         }
 
         if (args.HttpPort is not null)
         {
-            resourceBuilder.WithHttpEndpoint(port: args.HttpPort ?? 8080, name: "http");
+            resourceBuilder.WithHttpEndpoint(port: args.HttpPort, name: "http");
         }
 
         return resourceBuilder;

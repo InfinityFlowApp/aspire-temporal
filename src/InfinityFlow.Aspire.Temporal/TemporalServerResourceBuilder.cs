@@ -28,44 +28,44 @@ public class TemporalServerResourceBuilder
     }
 
     /// <summary>
-    /// Port for the frontend gRPC service (default: 7233)
+    /// Port for the frontend gRPC service. If not set, Aspire will allocate a random available port.
     /// </summary>
-    /// <param name="port"></param>
+    /// <param name="port">The port number, or null for dynamic allocation (default: null)</param>
     /// <returns></returns>
-    public TemporalServerResourceBuilder WithPort(int port)
+    public TemporalServerResourceBuilder WithPort(int? port)
     {
         Args.Port = port;
         return this;
     }
 
     /// <summary>
-    /// Port for the frontend HTTP service (default: disabled)
+    /// Port for the frontend HTTP service. If not set, this endpoint will not be created.
     /// </summary>
-    /// <param name="httpPort"></param>
+    /// <param name="httpPort">The port number, or null to disable this endpoint</param>
     /// <returns></returns>
-    public TemporalServerResourceBuilder WithHttpPort(int httpPort)
+    public TemporalServerResourceBuilder WithHttpPort(int? httpPort)
     {
         Args.HttpPort = httpPort;
         return this;
     }
 
     /// <summary>
-    /// Port for /metrics (default: disabled)
+    /// Port for /metrics. If not set, this endpoint will not be created.
     /// </summary>
-    /// <param name="metricsPort"></param>
+    /// <param name="metricsPort">The port number, or null to disable this endpoint</param>
     /// <returns></returns>
-    public TemporalServerResourceBuilder WithMetricsPort(int metricsPort)
+    public TemporalServerResourceBuilder WithMetricsPort(int? metricsPort)
     {
         Args.MetricsPort = metricsPort;
         return this;
     }
 
     /// <summary>
-    /// Port for the Web UI (default: --port + 1000, e.g. 8233)
+    /// Port for the Web UI. If not set, Aspire will allocate a random available port.
     /// </summary>
-    /// <param name="uiPort"></param>
+    /// <param name="uiPort">The port number, or null for dynamic allocation (default: null)</param>
     /// <returns></returns>
-    public TemporalServerResourceBuilder WithUiPort(int uiPort)
+    public TemporalServerResourceBuilder WithUiPort(int? uiPort)
     {
         Args.UiPort = uiPort;
         return this;

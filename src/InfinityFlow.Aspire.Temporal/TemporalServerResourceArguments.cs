@@ -16,9 +16,9 @@ public class TemporalServerResourceArguments
     public string? DbFileName { get; set; }
 
     /// <summary>
-    /// Gets or sets the port for the frontend gRPC service. Default is 7233.
+    /// Gets or sets the port for the frontend gRPC service. If not set, Aspire will allocate a random available port.
     /// </summary>
-    public int Port { get; set; } = 7233;
+    public int? Port { get; set; }
 
     /// <summary>
     /// Gets or sets the port for the frontend HTTP service. If not set, the service is disabled.
@@ -31,9 +31,9 @@ public class TemporalServerResourceArguments
     public int? MetricsPort { get; set; }
 
     /// <summary>
-    /// Gets or sets the port for the Web UI. Default is 8233.
+    /// Gets or sets the port for the Web UI. If not set, Aspire will allocate a random available port.
     /// </summary>
-    public int? UiPort { get; set; } = 8233;
+    public int? UiPort { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the Web UI is headless. If not set, defaults to false.
@@ -98,7 +98,7 @@ public class TemporalServerResourceArguments
             };
 
         AddIfNotNull(result, "--db-filename", DbFileName);
-        AddAlways(result, "--port", Port.ToString());
+        AddIfNotNull(result, "--port", Port?.ToString());
 
         AddIfNotNull(result, "--http-port", HttpPort?.ToString());
         AddIfNotNull(result, "--metrics-port", MetricsPort?.ToString());
@@ -161,9 +161,4 @@ public class TemporalServerResourceArguments
         }
     }
 
-    private static void AddAlways(List<string> list, string argument, string value)
-    {
-        list.Add(argument);
-        list.Add(value);
-    }
 }
