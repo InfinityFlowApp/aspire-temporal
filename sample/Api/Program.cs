@@ -1,34 +1,19 @@
-using System.Diagnostics.Metrics;
-
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 using Temporalio.Client;
-using Temporalio.Extensions.DiagnosticSource;
-using Temporalio.Extensions.OpenTelemetry;
-using Temporalio.Runtime;
 
 var builder = WebApplication.CreateBuilder(args);
 
-using var meter = new Meter("Temporal.Client");
-
-var runtime = new TemporalRuntime(new()
-{
-    Telemetry = new()
-    {
-        Metrics = new() { CustomMetricMeter = new CustomMetricMeter(meter) },
-    },
-});
-
 builder.AddServiceDefaults();
 
-builder.Services.AddTemporalClient(opts =>
-{
-    opts.TargetHost = builder.Configuration.GetConnectionString("temporal");
-    opts.Namespace = Constants.Namespace;
-    opts.Interceptors = [new TracingInterceptor()];
-    opts.Runtime = runtime;
-});
+// Use the new fluent API for Temporal client configuration
+// This automatically sets up OpenTelemetry tracing and metrics for the Aspire dashboard
+builder.AddTemporalClient()
+    .ConfigureOptions(opts =>
+    {
+        opts.Namespace = Constants.Namespace;
+    });
 
 var app = builder.Build();
 

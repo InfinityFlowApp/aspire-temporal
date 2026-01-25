@@ -73,61 +73,117 @@ var temporal = builder.AddTemporalServerContainer("temporal", x => x
 
 ### 4. Configure Client/Worker Applications
 
-The Temporal client can then be added to a .NET project as normal using the instructions from the [temporal dotnet sdk repo](https://github.com/temporalio/sdk-dotnet/)
+#### Install the Client Library
 
-It can be included in Aspire orchestration like below and can optionally take a reference to the Temporal resource.
+```sh
+dotnet add package InfinityFlow.Aspire.Temporal.Client
+```
+
+#### Reference Temporal in AppHost
+
+Include Temporal in your Aspire orchestration and reference it from your applications:
 
 ```csharp
 // ./samples/AppHost/Program.cs
 
-// ...
+var temporal = builder.AddTemporalServerContainer("temporal");
 
-var temporal = builder.AddTemporalServerExecutable("temporal");
+builder.AddProject<Projects.Worker>("worker")
+    .WithReference(temporal);  // Injects connection string automatically
 
-builder.AddProject<Projects.Worker>("worker") // my custom project
+builder.AddProject<Projects.Api>("api")
     .WithReference(temporal);
-
-// ...
 ```
 
-If using [Temporalio.Extensions.Hosting](https://github.com/temporalio/sdk-dotnet/blob/main/src/Temporalio.Extensions.Hosting/README.md) the client registration might look something like below. If we took the reference to the Temporal Aspire resource, then the TargetHost property is automatically injected under the key `ConnectionStrings:<Aspire Resource Name>`. (e.g., this will be `builder.Configuration["ConnectionStrings:temporal"]` for a resource named "temporal" as above)
+#### Configure Temporal Client
+
+The client library provides a fluent API with automatic OpenTelemetry configuration:
 
 ```csharp
-// register a client -  ./samples/Api/Program.cs
-builder.Services
-    .AddTemporalClient(opts =>
+// Register a client - ./samples/Api/Program.cs
+builder.AddTemporalClient()
+    .ConfigureOptions(opts =>
     {
-        // Connection string automatically resolves to the dynamically allocated server endpoint
-        opts.TargetHost = builder.Configuration.GetConnectionString("temporal");
         opts.Namespace = "default";
     })
-
-// or
-
-// register a worker - ./samples/Worker/Program.cs
-builder.Services
-    .AddTemporalClient(opts =>
+    .WithInterceptors(interceptors =>
     {
-        // Connection string automatically resolves to the dynamically allocated server endpoint
-        opts.TargetHost = builder.Configuration.GetConnectionString("temporal");
+        // Add custom interceptors if needed
+        interceptors.Add(new MyCustomInterceptor());
+    })
+    .WithTracingSources(sources =>
+    {
+        // Customize tracing sources (default: Temporalio.Client, Temporalio.Workflows, Temporalio.Activities)
+        sources.Add("MyCustomSource");
+    });
+
+// Or register a worker - ./samples/Worker/Program.cs
+builder.AddTemporalWorker("my-task-queue")
+    .ConfigureOptions(opts =>
+    {
         opts.Namespace = "default";
     })
-    .AddHostedTemporalWorker("my-task-queue")
+    .Services
     .AddScopedActivities<MyActivities>()
     .AddWorkflow<MyWorkflow>();
 ```
 
+**Key Features**:
+- **Automatic connection resolution**: Connection string is automatically retrieved from Aspire configuration
+- **OpenTelemetry integration**: Tracing and metrics configured automatically for Aspire dashboard
+- **Fluent API**: Chain configuration methods for clean, readable code
+- **Customizable**: Disable tracing/metrics, add custom interceptors, configure tracing sources
+
+**Advanced Configuration**:
+
+```csharp
+builder.AddTemporalClient(connectionName: "temporal")
+    .WithoutTracing()           // Disable automatic tracing
+    .WithoutMetrics()           // Disable automatic metrics
+    .ConfigureOptions(opts =>   // Direct access to TemporalClientConnectOptions
+    {
+        opts.Namespace = "production";
+        opts.Identity = "my-service";
+    });
+```
+
 ## Observability
 
-The extension doesn't provide any setup for observability, but you can follow [Temporalio.Extensions.DiagnosticSource](https://github.com/temporalio/sdk-dotnet/blob/main/src/Temporalio.Extensions.DiagnosticSource/README.md) and [Temporalio.Extensions.Hosting](https://github.com/temporalio/sdk-dotnet/blob/main/src/Temporalio.Extensions.Hosting/TemporalHostingServiceCollectionExtensions.cs) to configure this on the temporal client. If using the Aspire Service Defaults, you'll need to configure the metrics and tracing accordingly.
+The `InfinityFlow.Aspire.Temporal.Client` package provides **automatic OpenTelemetry configuration** for seamless integration with the Aspire dashboard:
 
-The sample folder has an example for configuring this with the Aspire Dashboard
+- **Automatic Tracing**: Configures `TracingInterceptor` to capture workflow and activity traces
+- **Automatic Metrics**: Configures `CustomMetricMeter` to export Temporal metrics
+- **Activity Sources**: Registers `Temporalio.Client`, `Temporalio.Workflows`, and `Temporalio.Activities` sources
+- **Aspire Dashboard Integration**: All telemetry flows to the Aspire dashboard automatically
 
+**Basic Setup** (automatic observability):
+```csharp
+// Client automatically configured with tracing and metrics
+builder.AddTemporalClient();
+```
+
+**Service Defaults Configuration** (optional, for centralized setup):
+
+If you want to configure OpenTelemetry in your ServiceDefaults project, you can use:
+
+```csharp
+// ServiceDefaults/Extensions.cs
+builder.Logging.AddTemporalObservability();
+
+// Or configure individually:
+builder.Services.ConfigureOpenTelemetryTracerProvider(tracing =>
+    tracing.AddTemporalTracing());
+
+builder.Services.ConfigureOpenTelemetryMeterProvider(metrics =>
+    metrics.AddTemporalMetrics());
+```
+
+See the sample folder for complete examples:
 - [sample/Api/Program.cs](./sample/Api/Program.cs) for an example client
 - [sample/Worker/Program.cs](./sample/Worker/Program.cs) for an example worker
-- [sample/ServiceDefaults/Extensions.cs](./sample/ServiceDefaults/Extensions.cs) for an example of adding the custom meter and tracing sources to the service defaults.
+- [sample/ServiceDefaults/Extensions.cs](./sample/ServiceDefaults/Extensions.cs) for service defaults configuration
 
-If done correctly, you should tracing and metrics on the Aspire dashboard:
+Once configured, you'll see tracing and metrics in the Aspire dashboard:
 
 #### Tracing
 
