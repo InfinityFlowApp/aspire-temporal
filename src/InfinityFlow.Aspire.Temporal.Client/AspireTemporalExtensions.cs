@@ -69,26 +69,49 @@ public class TemporalClientBuilder
     private bool _disableTracing;
     private bool _disableMetrics;
     private ITemporalWorkerServiceOptionsBuilder? _workerOptionsBuilder;
+    private bool _registered;
 
     /// <summary>
     /// Gets the service collection for additional DI registration.
+    /// Accessing this property triggers client registration if not already registered.
     /// </summary>
-    public IServiceCollection Services => _builder.Services;
+    public IServiceCollection Services
+    {
+        get
+        {
+            EnsureRegistered();
+            return _builder.Services;
+        }
+    }
 
     /// <summary>
     /// Gets the worker options builder for adding activities and workflows.
     /// Only available when using AddTemporalWorker().
+    /// Accessing this property triggers client registration if not already registered.
     /// </summary>
-    public ITemporalWorkerServiceOptionsBuilder? Worker => _workerOptionsBuilder;
+    public ITemporalWorkerServiceOptionsBuilder? Worker
+    {
+        get
+        {
+            EnsureRegistered();
+            return _workerOptionsBuilder;
+        }
+    }
 
     internal TemporalClientBuilder(IHostApplicationBuilder builder, string connectionName, string? taskQueue = null)
     {
         _builder = builder;
         _connectionName = connectionName;
         _taskQueue = taskQueue;
+    }
 
-        // Register the client immediately with mutable collections that will be read at runtime
-        RegisterClient();
+    private void EnsureRegistered()
+    {
+        if (!_registered)
+        {
+            RegisterClient();
+            _registered = true;
+        }
     }
 
     /// <summary>
@@ -100,7 +123,19 @@ public class TemporalClientBuilder
     public TemporalClientBuilder WithInterceptors(Action<IList<IClientInterceptor>> configure)
     {
         ArgumentNullException.ThrowIfNull(configure);
-        configure(_additionalInterceptors);
+
+        try
+        {
+            configure(_additionalInterceptors);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                "An error occurred while configuring Temporal client interceptors. " +
+                "Check your WithInterceptors callback for errors.",
+                ex);
+        }
+
         return this;
     }
 
@@ -113,7 +148,19 @@ public class TemporalClientBuilder
     public TemporalClientBuilder WithTracingSources(Action<IList<string>> configure)
     {
         ArgumentNullException.ThrowIfNull(configure);
-        configure(_tracingSources);
+
+        try
+        {
+            configure(_tracingSources);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException(
+                "An error occurred while configuring Temporal tracing sources. " +
+                "Check your WithTracingSources callback for errors.",
+                ex);
+        }
+
         return this;
     }
 
@@ -155,13 +202,23 @@ public class TemporalClientBuilder
 
         if (string.IsNullOrEmpty(connectionString))
         {
+            var availableConnections = _builder.Configuration.AsEnumerable()
+                .Where(kvp => kvp.Key.StartsWith("ConnectionStrings:") && !string.IsNullOrEmpty(kvp.Value))
+                .Select(kvp => kvp.Key.Replace("ConnectionStrings:", ""))
+                .ToList();
+
+            var availableInfo = availableConnections.Any()
+                ? $" Available connection names: {string.Join(", ", availableConnections)}"
+                : " No connection strings found in configuration.";
+
             throw new InvalidOperationException(
-                $"Temporal connection string '{_connectionName}' not found. " +
+                $"Temporal connection string '{_connectionName}' not found.{availableInfo} " +
                 $"Ensure the Temporal resource is referenced in AppHost using .WithReference(temporal).");
         }
 
-        // Create a meter for Temporal metrics
+        // Create and register a meter for Temporal metrics as a singleton for proper disposal
         var meter = new Meter("Temporal.Client");
+        _builder.Services.AddSingleton(meter);
 
         // Create Temporal runtime with OpenTelemetry configuration
         var runtime = new TemporalRuntime(new()
@@ -178,6 +235,12 @@ public class TemporalClientBuilder
             // Add sources from the mutable list (which can be modified via WithTracingSources)
             foreach (var source in _tracingSources)
             {
+                if (string.IsNullOrWhiteSpace(source))
+                {
+                    throw new InvalidOperationException(
+                        "Tracing source name cannot be null or whitespace. " +
+                        "Check your WithTracingSources configuration.");
+                }
                 tracing.AddSource(source);
             }
         });
@@ -205,7 +268,17 @@ public class TemporalClientBuilder
             // Apply all configuration actions
             foreach (var configure in _configureActions)
             {
-                configure(opts);
+                try
+                {
+                    configure(opts);
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException(
+                        "An error occurred while configuring Temporal client options. " +
+                        "Check your ConfigureOptions callback for errors.",
+                        ex);
+                }
             }
         });
 

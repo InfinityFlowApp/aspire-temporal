@@ -9,12 +9,16 @@ builder.AddServiceDefaults();
 
 // Use the new fluent API for Temporal worker configuration
 // This automatically sets up OpenTelemetry tracing and metrics for the Aspire dashboard
-builder.AddTemporalWorker(Constants.TaskQueueName)
+var workerBuilder = builder.AddTemporalWorker(Constants.TaskQueueName)
     .ConfigureOptions(opts =>
     {
         opts.Namespace = Constants.Namespace;
-    })
-    .Worker?
+    });
+
+if (workerBuilder.Worker is null)
+    throw new InvalidOperationException("Worker builder was not created. Ensure AddTemporalWorker was called correctly.");
+
+workerBuilder.Worker
     .AddScopedActivities<HelloActivities>()
     .AddWorkflow<HelloWorkflow>();
 

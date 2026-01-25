@@ -83,7 +83,7 @@ public class TemporalServerResourceBuilder
     }
 
     /// <summary>
-    /// IPv4 address to bind the frontend service to (default: "127.0.0.1")
+    /// IPv4 address to bind the frontend service to (default: "0.0.0.0")
     /// </summary>
     /// <param name="ip"></param>
     /// <returns></returns>

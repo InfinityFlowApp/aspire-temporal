@@ -137,7 +137,7 @@ public class TemporalServerResourceArguments
         {
             result.Add("--dynamic-config-value");
 
-            result.Add($"{k}={v switch
+            var formattedValue = v switch
             {
                 string s => $""" "{v}" """,
                 bool b => b.ToString().ToLowerInvariant(),
@@ -145,8 +145,13 @@ public class TemporalServerResourceArguments
                 float f => f.ToString("F"),
                 double d => d.ToString("F"),
                 long l => l.ToString(),
-                _ => null,
-            }}");
+                _ => throw new ArgumentException(
+                    $"Unsupported type '{v.GetType().Name}' for dynamic config value '{k}'. " +
+                    $"Supported types are: string, bool, int, float, double, long.",
+                    nameof(DynamicConfigValues))
+            };
+
+            result.Add($"{k}={formattedValue}");
         }
 
         return [.. result];
