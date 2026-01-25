@@ -3,17 +3,22 @@
 using InfinityFlow.Aspire.Temporal;
 
 namespace Aspire.Hosting;
+
+/// <summary>
+/// Extension methods for adding Temporal server as a container resource to an Aspire application.
+/// </summary>
 public static class TemporalServerContainerBuilderExtensions
 {
     internal const string TemporalServerImageName = "temporalio/admin-tools";
     internal const string TemporalServerImageTag = "1.28.2-tctl-1.18.1-cli-1.1.1";
+
     /// <summary>
-    /// Adds a temporal server resource instance to the Aspire host. Requires the Temporal Container location to be in your path.
+    /// Adds a Temporal server container resource to the Aspire host with custom configuration.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="name"></param>
-    /// <param name="callback"></param>
-    /// <returns></returns>
+    /// <param name="builder">The distributed application builder.</param>
+    /// <param name="name">The name of the resource.</param>
+    /// <param name="callback">Callback to configure the Temporal server options using a fluent builder.</param>
+    /// <returns>A resource builder for the Temporal server container.</returns>
     public static IResourceBuilder<TemporalServerContainerResource> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name,
         Action<TemporalServerResourceBuilder> callback)
     {
@@ -25,11 +30,11 @@ public static class TemporalServerContainerBuilderExtensions
     }
 
     /// <summary>
-    /// Adds a temporal server resource instance to the Aspire host. Requires the Temporal Container location to be in your path.
+    /// Adds a Temporal server container resource to the Aspire host with default configuration.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="name"></param>
-    /// <returns></returns>
+    /// <param name="builder">The distributed application builder.</param>
+    /// <param name="name">The name of the resource.</param>
+    /// <returns>A resource builder for the Temporal server container.</returns>
     public static IResourceBuilder<TemporalServerContainerResource> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name)
     {
         return builder.AddTemporalServerContainer(name, new TemporalServerResourceArguments());

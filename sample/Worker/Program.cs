@@ -1,35 +1,20 @@
-using System.Diagnostics.Metrics;
-
+using Aspire.Hosting;
 using Temporalio.Activities;
-using Temporalio.Extensions.DiagnosticSource;
 using Temporalio.Extensions.Hosting;
-using Temporalio.Extensions.OpenTelemetry;
-using Temporalio.Runtime;
 using Temporalio.Workflows;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-using var meter = new Meter("Temporal.Client");
-
-var runtime = new TemporalRuntime(new()
-{
-    Telemetry = new()
-    {
-        Metrics = new() { CustomMetricMeter = new CustomMetricMeter(meter) },
-    },
-});
-
 builder.AddServiceDefaults();
 
-builder.Services
-    .AddTemporalClient(opts =>
+// Use the new fluent API for Temporal worker configuration
+// This automatically sets up OpenTelemetry tracing and metrics for the Aspire dashboard
+builder.AddTemporalWorker(Constants.TaskQueueName)
+    .ConfigureOptions(opts =>
     {
-        opts.TargetHost = builder.Configuration.GetConnectionString("temporal");
         opts.Namespace = Constants.Namespace;
-        opts.Interceptors = new[] { new TracingInterceptor() };
-        opts.Runtime = runtime;
     })
-    .AddHostedTemporalWorker(Constants.TaskQueueName)
+    .Worker?
     .AddScopedActivities<HelloActivities>()
     .AddWorkflow<HelloWorkflow>();
 

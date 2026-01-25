@@ -68,11 +68,18 @@ public class TemporalClientBuilder
     private readonly List<Action<TemporalClientConnectOptions>> _configureActions = new();
     private bool _disableTracing;
     private bool _disableMetrics;
+    private ITemporalWorkerServiceOptionsBuilder? _workerOptionsBuilder;
 
     /// <summary>
     /// Gets the service collection for additional DI registration.
     /// </summary>
     public IServiceCollection Services => _builder.Services;
+
+    /// <summary>
+    /// Gets the worker options builder for adding activities and workflows.
+    /// Only available when using AddTemporalWorker().
+    /// </summary>
+    public ITemporalWorkerServiceOptionsBuilder? Worker => _workerOptionsBuilder;
 
     internal TemporalClientBuilder(IHostApplicationBuilder builder, string connectionName, string? taskQueue = null)
     {
@@ -205,7 +212,7 @@ public class TemporalClientBuilder
         // Add worker if task queue is specified
         if (_taskQueue is not null)
         {
-            serviceCollection.AddHostedTemporalWorker(_taskQueue);
+            _workerOptionsBuilder = serviceCollection.AddHostedTemporalWorker(_taskQueue);
         }
     }
 }

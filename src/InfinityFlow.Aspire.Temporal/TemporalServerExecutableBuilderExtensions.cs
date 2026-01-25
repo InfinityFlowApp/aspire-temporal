@@ -3,15 +3,20 @@
 using InfinityFlow.Aspire.Temporal;
 
 namespace Aspire.Hosting;
+
+/// <summary>
+/// Extension methods for adding Temporal server as an executable resource to an Aspire application.
+/// </summary>
 public static class TemporalServerExecutableBuilderExtensions
 {
     /// <summary>
-    /// Adds a temporal server resource instance to the Aspire host. Requires the Temporal executable location to be in your path.
+    /// Adds a Temporal server executable resource to the Aspire host with custom configuration.
+    /// Requires the Temporal CLI executable to be in your PATH.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="name"></param>
-    /// <param name="callback"></param>
-    /// <returns></returns>
+    /// <param name="builder">The distributed application builder.</param>
+    /// <param name="name">The name of the resource.</param>
+    /// <param name="callback">Callback to configure the Temporal server options using a fluent builder.</param>
+    /// <returns>A resource builder for the Temporal server executable.</returns>
     public static IResourceBuilder<TemporalServerExecutableResource> AddTemporalServerExecutable(this IDistributedApplicationBuilder builder, string name,
         Action<TemporalServerResourceBuilder> callback)
     {
@@ -23,11 +28,12 @@ public static class TemporalServerExecutableBuilderExtensions
     }
 
     /// <summary>
-    /// Adds a temporal server resource instance to the Aspire host. Requires the Temporal executable location to be in your path.
+    /// Adds a Temporal server executable resource to the Aspire host with default configuration.
+    /// Requires the Temporal CLI executable to be in your PATH.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="name"></param>
-    /// <returns></returns>
+    /// <param name="builder">The distributed application builder.</param>
+    /// <param name="name">The name of the resource.</param>
+    /// <returns>A resource builder for the Temporal server executable.</returns>
     public static IResourceBuilder<TemporalServerExecutableResource> AddTemporalServerExecutable(this IDistributedApplicationBuilder builder, string name)
     {
         return builder.AddTemporalServerExecutable(name, new TemporalServerResourceArguments());
