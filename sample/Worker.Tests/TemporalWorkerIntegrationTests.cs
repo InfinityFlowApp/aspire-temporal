@@ -54,37 +54,50 @@ public class TemporalWorkerIntegrationTests
 
     /// <summary>
     /// Integration test that verifies Temporal server starts successfully in Aspire.
-    /// Requires Temporal CLI binary to be installed and available on PATH.
-    /// Run: dotnet test --filter "FullyQualifiedName~AspireIntegration"
+    ///
+    /// REQUIREMENTS:
+    /// - Install Temporal CLI: https://docs.temporal.io/cli/#install
+    ///   Linux/Mac: curl -sSf https://temporal.download/cli.sh | sh
+    ///   Windows: scoop install temporal-cli
+    /// - Ensure 'temporal' is on your PATH
+    ///
+    /// To run: dotnet test --filter AspireIntegration_TemporalServer_StartsSuccessfully
     /// </summary>
-    [Fact(Skip = "Requires Temporal CLI binary installed - run manually with 'dotnet test --filter AspireIntegration_TemporalServer_StartsSuccessfully'")]
+    [Fact(Skip = "Requires Temporal CLI installed on PATH - see test documentation")]
     public async Task AspireIntegration_TemporalServer_StartsSuccessfully()
     {
         // Arrange
-        var cancellationToken = new CancellationTokenSource(DefaultTimeout).Token;
+        var cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(2)).Token;
         var appHost = await DistributedApplicationTestingBuilder.CreateAsync<Projects.AppHost>(cancellationToken);
 
         appHost.Services.AddLogging(logging =>
         {
             logging.SetMinimumLevel(LogLevel.Information);
             logging.AddFilter("Aspire.", LogLevel.Debug);
+            logging.AddFilter("Temporalio", LogLevel.Debug);
         });
 
         // Act - Build and start the Aspire application
-        await using var app = await appHost.BuildAsync(cancellationToken).WaitAsync(DefaultTimeout, cancellationToken);
-        await app.StartAsync(cancellationToken).WaitAsync(DefaultTimeout, cancellationToken);
+        await using var app = await appHost.BuildAsync(cancellationToken).WaitAsync(TimeSpan.FromSeconds(60), cancellationToken);
+        await app.StartAsync(cancellationToken).WaitAsync(TimeSpan.FromSeconds(60), cancellationToken);
 
         // Assert - Wait for Temporal to be healthy (verifies resource exists and is running)
         await app.ResourceNotifications.WaitForResourceHealthyAsync("temporal", cancellationToken)
-            .WaitAsync(DefaultTimeout, cancellationToken);
+            .WaitAsync(TimeSpan.FromSeconds(60), cancellationToken);
     }
 
     /// <summary>
     /// End-to-end integration test that verifies Worker connects to Temporal server in Aspire.
-    /// Requires Temporal CLI binary to be installed and available on PATH.
-    /// Run: dotnet test --filter "FullyQualifiedName~AspireIntegration"
+    ///
+    /// REQUIREMENTS:
+    /// - Install Temporal CLI: https://docs.temporal.io/cli/#install
+    ///   Linux/Mac: curl -sSf https://temporal.download/cli.sh | sh
+    ///   Windows: scoop install temporal-cli
+    /// - Ensure 'temporal' is on your PATH
+    ///
+    /// To run: dotnet test --filter AspireIntegration_Worker_ConnectsToTemporal
     /// </summary>
-    [Fact(Skip = "Requires Temporal CLI binary installed - run manually with 'dotnet test --filter AspireIntegration_Worker_ConnectsToTemporal'")]
+    [Fact(Skip = "Requires Temporal CLI installed on PATH - see test documentation")]
     public async Task AspireIntegration_Worker_ConnectsToTemporal()
     {
         // Arrange
@@ -99,8 +112,8 @@ public class TemporalWorkerIntegrationTests
         });
 
         // Act - Build and start
-        await using var app = await appHost.BuildAsync(cancellationToken).WaitAsync(DefaultTimeout, cancellationToken);
-        await app.StartAsync(cancellationToken).WaitAsync(DefaultTimeout, cancellationToken);
+        await using var app = await appHost.BuildAsync(cancellationToken).WaitAsync(TimeSpan.FromSeconds(60), cancellationToken);
+        await app.StartAsync(cancellationToken).WaitAsync(TimeSpan.FromSeconds(60), cancellationToken);
 
         // Assert - Wait for resources to be healthy (verifies they exist and are running)
         await app.ResourceNotifications.WaitForResourceHealthyAsync("temporal", cancellationToken)
