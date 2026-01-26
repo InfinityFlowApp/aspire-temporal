@@ -246,8 +246,8 @@ public class GetArgsTests
     }
 
     [Theory]
-    [InlineData(SQLitePragma.JournalMode, "journal_mode")]
-    [InlineData(SQLitePragma.Synchronous, "synchronous")]
+    [InlineData(SQLitePragma.JournalMode, "journal_mode=WAL")]
+    [InlineData(SQLitePragma.Synchronous, "synchronous=NORMAL")]
     public void GetArgs_WithSQLitePragma_IncludesSQLitePragmaFlag(SQLitePragma pragma, string expected)
     {
         // Arrange
@@ -261,8 +261,7 @@ public class GetArgsTests
 
         // Assert
         Assert.Contains("--sqlite-pragma", cmdArgs);
-        // Note: Current implementation outputs just the pragma name, not pragma=value format
-        // This matches the enum helper implementation
+        // Temporal CLI expects pragma=value format
         Assert.Contains(expected, cmdArgs);
     }
 

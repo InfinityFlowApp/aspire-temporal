@@ -90,14 +90,14 @@ public static class EnumHelpers
     };
 
     /// <summary>
-    /// Converts a SQLitePragma enum to its Temporal CLI string representation.
+    /// Converts a SQLitePragma enum to its Temporal CLI string representation in pragma=value format.
     /// </summary>
     /// <param name="pragma">The SQLite pragma to convert.</param>
-    /// <returns>The string representation for Temporal CLI.</returns>
+    /// <returns>The string representation for Temporal CLI in pragma=value format.</returns>
     public static string SQLitePragmaToString(SQLitePragma pragma) => pragma switch
     {
-        SQLitePragma.JournalMode => "journal_mode",
-        SQLitePragma.Synchronous => "synchronous",
+        SQLitePragma.JournalMode => "journal_mode=WAL",
+        SQLitePragma.Synchronous => "synchronous=NORMAL",
         _ => throw new ArgumentOutOfRangeException(nameof(pragma), pragma, null),
     };
 }
