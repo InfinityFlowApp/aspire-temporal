@@ -87,6 +87,7 @@ public sealed class TemporalResourceBuilder
     /// <returns>The builder for method chaining.</returns>
     public TemporalResourceBuilder WithCommand(string command)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(command);
         ThrowIfAlreadyBuilt();
         _args.Command = command;
         return this;
@@ -100,6 +101,7 @@ public sealed class TemporalResourceBuilder
     /// <returns>The builder for method chaining.</returns>
     public TemporalResourceBuilder WithDbFileName(string dbFileName)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(dbFileName);
         ThrowIfAlreadyBuilt();
         _args.DbFileName = dbFileName;
         return this;
@@ -109,10 +111,16 @@ public sealed class TemporalResourceBuilder
     /// Configures the port for the frontend gRPC service endpoint.
     /// If not set, Aspire will allocate a random available port.
     /// </summary>
-    /// <param name="port">The port number, or null for dynamic allocation.</param>
+    /// <param name="port">The port number (1-65535), or null for dynamic allocation.</param>
     /// <returns>The builder for method chaining.</returns>
     public TemporalResourceBuilder WithServiceEndpoint(int? port = null)
     {
+        if (port.HasValue && (port.Value < 1 || port.Value > 65535))
+        {
+            throw new ArgumentOutOfRangeException(nameof(port), port.Value,
+                "Port must be between 1 and 65535.");
+        }
+
         ThrowIfAlreadyBuilt();
         _args.Port = port;
         return this;
@@ -122,10 +130,16 @@ public sealed class TemporalResourceBuilder
     /// Configures the port for the Web UI endpoint.
     /// If not set, Aspire will allocate a random available port.
     /// </summary>
-    /// <param name="port">The port number, or null for dynamic allocation.</param>
+    /// <param name="port">The port number (1-65535), or null for dynamic allocation.</param>
     /// <returns>The builder for method chaining.</returns>
     public TemporalResourceBuilder WithUiEndpoint(int? port = null)
     {
+        if (port.HasValue && (port.Value < 1 || port.Value > 65535))
+        {
+            throw new ArgumentOutOfRangeException(nameof(port), port.Value,
+                "Port must be between 1 and 65535.");
+        }
+
         ThrowIfAlreadyBuilt();
         _args.UiPort = port;
         _args.Headless = false;
@@ -135,10 +149,16 @@ public sealed class TemporalResourceBuilder
     /// <summary>
     /// Configures the port for the metrics endpoint.
     /// </summary>
-    /// <param name="port">The port number.</param>
+    /// <param name="port">The port number (1-65535).</param>
     /// <returns>The builder for method chaining.</returns>
     public TemporalResourceBuilder WithMetricsEndpoint(int port)
     {
+        if (port < 1 || port > 65535)
+        {
+            throw new ArgumentOutOfRangeException(nameof(port), port,
+                "Port must be between 1 and 65535.");
+        }
+
         ThrowIfAlreadyBuilt();
         _args.MetricsPort = port;
         return this;
@@ -147,10 +167,16 @@ public sealed class TemporalResourceBuilder
     /// <summary>
     /// Configures the port for the HTTP endpoint.
     /// </summary>
-    /// <param name="port">The port number.</param>
+    /// <param name="port">The port number (1-65535).</param>
     /// <returns>The builder for method chaining.</returns>
     public TemporalResourceBuilder WithHttpEndpoint(int port)
     {
+        if (port < 1 || port > 65535)
+        {
+            throw new ArgumentOutOfRangeException(nameof(port), port,
+                "Port must be between 1 and 65535.");
+        }
+
         ThrowIfAlreadyBuilt();
         _args.HttpPort = port;
         return this;
@@ -175,6 +201,7 @@ public sealed class TemporalResourceBuilder
     /// <returns>The builder for method chaining.</returns>
     public TemporalResourceBuilder WithIp(string ip)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(ip);
         ThrowIfAlreadyBuilt();
         _args.Ip = ip;
         return this;
@@ -187,6 +214,7 @@ public sealed class TemporalResourceBuilder
     /// <returns>The builder for method chaining.</returns>
     public TemporalResourceBuilder WithUiIp(string uiIp)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(uiIp);
         ThrowIfAlreadyBuilt();
         _args.UiIp = uiIp;
         return this;
@@ -199,6 +227,7 @@ public sealed class TemporalResourceBuilder
     /// <returns>The builder for method chaining.</returns>
     public TemporalResourceBuilder WithUiAssetsPath(string assetsPath)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(assetsPath);
         ThrowIfAlreadyBuilt();
         _args.UiAssetPath = assetsPath;
         return this;
@@ -211,6 +240,7 @@ public sealed class TemporalResourceBuilder
     /// <returns>The builder for method chaining.</returns>
     public TemporalResourceBuilder WithUiCodecEndpoint(string codecEndpoint)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(codecEndpoint);
         ThrowIfAlreadyBuilt();
         _args.UiCodecEndpoint = codecEndpoint;
         return this;
@@ -260,6 +290,19 @@ public sealed class TemporalResourceBuilder
     /// <returns>The builder for method chaining.</returns>
     public TemporalResourceBuilder WithNamespace(params string[] namespaces)
     {
+        ArgumentNullException.ThrowIfNull(namespaces);
+
+        foreach (var ns in namespaces)
+        {
+            if (string.IsNullOrWhiteSpace(ns))
+            {
+                throw new ArgumentException(
+                    "Namespace names cannot be null or whitespace. " +
+                    "Check your WithNamespace call for empty or null values.",
+                    nameof(namespaces));
+            }
+        }
+
         ThrowIfAlreadyBuilt();
         _args.Namespaces.AddRange(namespaces);
         return this;
@@ -273,6 +316,9 @@ public sealed class TemporalResourceBuilder
     /// <returns>The builder for method chaining.</returns>
     public TemporalResourceBuilder WithDynamicConfigValue(string key, object value)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(key);
+        ArgumentNullException.ThrowIfNull(value);
+
         ThrowIfAlreadyBuilt();
         _args.DynamicConfigValues.Add(key, value);
         return this;
