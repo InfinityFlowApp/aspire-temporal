@@ -2,7 +2,7 @@ using Aspire.Hosting.ApplicationModel;
 
 namespace Aspire.Hosting;
 
-public class TemporalServerExecutableResource(string name) : ExecutableResource(name, command: "temporal", workingDirectory: ""), InfinityFlow.Aspire.Temporal.ITemporalServerResource
+public class TemporalServerContainerResource(string name) : ContainerResource(name), InfinityFlow.Aspire.Temporal.ITemporalServerResource, IResourceWithEnvironment
 {
     public ReferenceExpression ConnectionStringExpression =>
         ReferenceExpression.Create($"{this.GetEndpoint("server").Property(EndpointProperty.HostAndPort)}");
