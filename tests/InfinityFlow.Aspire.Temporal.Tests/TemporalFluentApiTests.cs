@@ -223,26 +223,30 @@ public class TemporalFluentApiTests
     }
 
     [Fact]
-    public void WithDataVolume_UpsertsDbFileNameAnnotation()
+    public void WithDataVolume_RespectsExistingDbFileName()
     {
         var builder = DistributedApplication.CreateBuilder();
         var temporal = builder.AddTemporalServerContainer("test")
             .WithDbFileName("/custom/path.db")
             .WithDataVolume();
-        var annotations = temporal.Resource.Annotations.OfType<TemporalDbFileNameAnnotation>().ToList();
-        Assert.Single(annotations);
-        Assert.Equal("/data/temporal.db", annotations[0].FileName);
+        var annotation = temporal.Resource.Annotations.OfType<TemporalDbFileNameAnnotation>().Single();
+        Assert.Equal("/custom/path.db", annotation.FileName);
+        var volume = temporal.Resource.Annotations.OfType<ContainerMountAnnotation>()
+            .Single(a => a.Type == ContainerMountType.Volume);
+        Assert.Equal("/custom", volume.Target);
     }
 
     [Fact]
-    public void WithDataBindMount_UpsertsDbFileNameAnnotation()
+    public void WithDataBindMount_RespectsExistingDbFileName()
     {
         var builder = DistributedApplication.CreateBuilder();
         var temporal = builder.AddTemporalServerContainer("test")
             .WithDbFileName("/custom/path.db")
             .WithDataBindMount("/host/data");
-        var annotations = temporal.Resource.Annotations.OfType<TemporalDbFileNameAnnotation>().ToList();
-        Assert.Single(annotations);
-        Assert.Equal("/data/temporal.db", annotations[0].FileName);
+        var annotation = temporal.Resource.Annotations.OfType<TemporalDbFileNameAnnotation>().Single();
+        Assert.Equal("/custom/path.db", annotation.FileName);
+        var mount = temporal.Resource.Annotations.OfType<ContainerMountAnnotation>()
+            .Single(a => a.Type == ContainerMountType.BindMount);
+        Assert.Equal("/custom", mount.Target);
     }
 }
