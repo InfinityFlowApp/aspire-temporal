@@ -161,6 +161,9 @@ builder.AddTemporalServerContainer("temporal")
     .WithLogLevel(LogLevel.Info)                      // --log-level
     .WithSQLitePragma(SQLitePragma.JournalMode)       // --sqlite-pragma
     .WithDynamicConfigValue("key", value)             // --dynamic-config-value
+    .WithLogConfig(true)                               // --log-config
+    .WithSearchAttribute("MyKey", SearchAttributeType.Keyword) // --search-attribute
+    .WithUiPublicPath("/temporal")                     // --ui-public-path
     .WithImageTag("latest");                          // custom image tag
 ```
 
