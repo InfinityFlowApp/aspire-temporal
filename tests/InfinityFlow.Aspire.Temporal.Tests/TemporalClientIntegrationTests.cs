@@ -19,7 +19,8 @@ public class TemporalClientIntegrationTests
     [Fact]
     public async Task AddTemporalClient_ResolvesConnectionAndConnects()
     {
-        var (address, port) = await StartTemporalServer();
+        var (address, port, aspireApp) = await StartTemporalServer();
+        await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
         hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
@@ -39,7 +40,8 @@ public class TemporalClientIntegrationTests
     [Fact]
     public async Task AddTemporalClient_ConfigureClientSetsNamespace()
     {
-        var (address, port) = await StartTemporalServer();
+        var (address, port, aspireApp) = await StartTemporalServer();
+        await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
         hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
@@ -61,7 +63,8 @@ public class TemporalClientIntegrationTests
     [Fact]
     public async Task AddTemporalClient_ConfigureOptionsApplies()
     {
-        var (address, port) = await StartTemporalServer();
+        var (address, port, aspireApp) = await StartTemporalServer();
+        await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
         hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
@@ -81,7 +84,8 @@ public class TemporalClientIntegrationTests
     [Fact]
     public async Task HealthCheck_ReturnsHealthy_WhenConnected()
     {
-        var (address, port) = await StartTemporalServer();
+        var (address, port, aspireApp) = await StartTemporalServer();
+        await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
         hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
@@ -103,7 +107,8 @@ public class TemporalClientIntegrationTests
     [Fact]
     public async Task AddTemporalWorker_RegistersWorkflowAndActivities()
     {
-        var (address, port) = await StartTemporalServer();
+        var (address, port, aspireApp) = await StartTemporalServer();
+        await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
         hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
@@ -113,7 +118,6 @@ public class TemporalClientIntegrationTests
             .AddScopedActivities<TestActivities>();
 
         using var host = hostBuilder.Build();
-        // StartAsync starts the hosted worker — it should connect without error
         await host.StartAsync();
 
         var client = host.Services.GetRequiredService<ITemporalClient>();
@@ -125,7 +129,8 @@ public class TemporalClientIntegrationTests
     [Fact]
     public async Task AddTemporalWorker_ExecutesWorkflow()
     {
-        var (address, port) = await StartTemporalServer();
+        var (address, port, aspireApp) = await StartTemporalServer();
+        await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
         hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
@@ -151,7 +156,8 @@ public class TemporalClientIntegrationTests
     [Fact]
     public async Task AddTemporalWorker_TransientActivities()
     {
-        var (address, port) = await StartTemporalServer();
+        var (address, port, aspireApp) = await StartTemporalServer();
+        await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
         hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
@@ -177,7 +183,8 @@ public class TemporalClientIntegrationTests
     [Fact]
     public async Task AddTemporalWorker_SingletonActivities()
     {
-        var (address, port) = await StartTemporalServer();
+        var (address, port, aspireApp) = await StartTemporalServer();
+        await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
         hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
@@ -203,7 +210,8 @@ public class TemporalClientIntegrationTests
     [Fact]
     public async Task AddTemporalWorker_ActivitiesInstance()
     {
-        var (address, port) = await StartTemporalServer();
+        var (address, port, aspireApp) = await StartTemporalServer();
+        await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
         hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
@@ -227,13 +235,16 @@ public class TemporalClientIntegrationTests
     }
 
     /// <summary>
-    /// Starts a Temporal dev server via Aspire and returns (address, port).
+    /// Starts a Temporal dev server via Aspire and returns (address, port, app).
+    /// Each test gets a uniquely named resource to avoid container conflicts.
     /// </summary>
-    private static async Task<(string Address, int Port)> StartTemporalServer()
+    private static async Task<(string Address, int Port, DistributedApplication App)> StartTemporalServer(
+        [System.Runtime.CompilerServices.CallerMemberName] string callerName = "")
     {
+        var resourceName = $"t-{callerName}".ToLowerInvariant().Replace("_", "-");
         var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.TestAppHost>();
 
-        var temporal = builder.AddTemporalServerContainer("temporal");
+        var temporal = builder.AddTemporalServerContainer(resourceName);
         temporal.WithEndpoint(scheme: "http", targetPort: 7233, name: "grpc-direct", isProxied: false);
 
         var app = await builder.BuildAsync();
@@ -241,7 +252,7 @@ public class TemporalClientIntegrationTests
         var rns = app.Services.GetRequiredService<ResourceNotificationService>();
         await app.StartAsync();
 
-        await rns.WaitForResourceAsync("temporal", KnownResourceStates.Running)
+        await rns.WaitForResourceAsync(resourceName, KnownResourceStates.Running)
             .WaitAsync(TimeSpan.FromSeconds(120));
 
         var directEndpoint = temporal.Resource.Annotations
@@ -254,7 +265,7 @@ public class TemporalClientIntegrationTests
         // Allow server to fully initialize
         await Task.Delay(3000);
 
-        return (address, port);
+        return (address, port, app);
     }
 
     [Workflow]

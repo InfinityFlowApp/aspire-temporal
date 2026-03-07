@@ -19,7 +19,7 @@ public class TemporalIntegrationTests
     {
         var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.TestAppHost>();
 
-        var temporal = builder.AddTemporalServerContainer("temporal")
+        var temporal = builder.AddTemporalServerContainer("temporal-search")
             .WithSearchAttribute("CustomKeyword", SearchAttributeType.Keyword)
             .WithSearchAttribute("CustomText", SearchAttributeType.Text)
             .WithSearchAttribute("CustomBool", SearchAttributeType.Bool)
@@ -36,7 +36,7 @@ public class TemporalIntegrationTests
         var rns = app.Services.GetRequiredService<ResourceNotificationService>();
         await app.StartAsync();
 
-        await rns.WaitForResourceAsync("temporal", KnownResourceStates.Running)
+        await rns.WaitForResourceAsync("temporal-search", KnownResourceStates.Running)
             .WaitAsync(TimeSpan.FromSeconds(120));
 
         var directEndpoint = temporal.Resource.Annotations
@@ -75,7 +75,7 @@ public class TemporalIntegrationTests
     {
         var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.TestAppHost>();
 
-        var temporal = builder.AddTemporalServerContainer("temporal")
+        var temporal = builder.AddTemporalServerContainer("temporal-ns")
             .WithNamespace("custom-ns-1", "custom-ns-2");
 
         temporal.WithEndpoint(scheme: "http", targetPort: 7233, name: "grpc-direct", isProxied: false);
@@ -85,7 +85,7 @@ public class TemporalIntegrationTests
         var rns = app.Services.GetRequiredService<ResourceNotificationService>();
         await app.StartAsync();
 
-        await rns.WaitForResourceAsync("temporal", KnownResourceStates.Running)
+        await rns.WaitForResourceAsync("temporal-ns", KnownResourceStates.Running)
             .WaitAsync(TimeSpan.FromSeconds(120));
 
         var directEndpoint = temporal.Resource.Annotations
