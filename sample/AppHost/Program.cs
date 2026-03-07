@@ -16,6 +16,10 @@ var temporalWithPorts = builder.AddTemporalServerContainer("temporalWithPorts")
     .WithNamespace("test1", "test2")
     .WithDynamicConfigValue("frontend.enableUpdateWorkflowExecution", true);
 
+var temporalPersistent = builder.AddTemporalServerContainer("temporalPersistent")
+    .WithDataVolume()
+    .WithLifetime(ContainerLifetime.Persistent);
+
 builder.AddProject<Projects.Api>("api")
     .WithReference(temporal);
 
