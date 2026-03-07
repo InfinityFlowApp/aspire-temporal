@@ -90,6 +90,30 @@ public static class TemporalServerResourceExtensions
         return builder;
     }
 
+    /// <summary>Enables logging server configuration to stderr.</summary>
+    public static IResourceBuilder<T> WithLogConfig<T>(this IResourceBuilder<T> builder, bool enabled = true)
+        where T : ITemporalServerResource
+    {
+        builder.Resource.Annotations.Add(new TemporalLogConfigAnnotation(enabled));
+        return builder;
+    }
+
+    /// <summary>Registers a custom search attribute at server launch.</summary>
+    public static IResourceBuilder<T> WithSearchAttribute<T>(this IResourceBuilder<T> builder, string key, SearchAttributeType type)
+        where T : ITemporalServerResource
+    {
+        builder.Resource.Annotations.Add(new TemporalSearchAttributeAnnotation(key, type));
+        return builder;
+    }
+
+    /// <summary>Sets the public base path for the Web UI.</summary>
+    public static IResourceBuilder<T> WithUiPublicPath<T>(this IResourceBuilder<T> builder, string publicPath)
+        where T : ITemporalServerResource
+    {
+        builder.Resource.Annotations.Add(new TemporalUiPublicPathAnnotation(publicPath));
+        return builder;
+    }
+
     // --- Container-specific endpoint methods ---
 
     /// <summary>Sets the gRPC service port for the Temporal container.</summary>

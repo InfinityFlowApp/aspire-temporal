@@ -69,10 +69,29 @@ public static class TemporalServerArgsBuilder
             result.Add(EnumHelpers.SQLitePragmaToString(sqlitePragma.Pragma));
         }
 
+        var logConfig = resource.Annotations.OfType<TemporalLogConfigAnnotation>().LastOrDefault();
+        if (logConfig is not null && logConfig.Enabled)
+        {
+            result.Add("--log-config");
+        }
+
+        var uiPublicPath = resource.Annotations.OfType<TemporalUiPublicPathAnnotation>().LastOrDefault();
+        if (uiPublicPath is not null)
+        {
+            result.Add("--ui-public-path");
+            result.Add(uiPublicPath.PublicPath);
+        }
+
         foreach (var ns in resource.Annotations.OfType<TemporalNamespaceAnnotation>())
         {
             result.Add("--namespace");
             result.Add(ns.Namespace);
+        }
+
+        foreach (var sa in resource.Annotations.OfType<TemporalSearchAttributeAnnotation>())
+        {
+            result.Add("--search-attribute");
+            result.Add($"{sa.Key}={EnumHelpers.SearchAttributeTypeToString(sa.Type)}");
         }
 
         foreach (var dc in resource.Annotations.OfType<TemporalDynamicConfigAnnotation>())

@@ -9,7 +9,7 @@ namespace Aspire.Hosting;
 public static class TemporalServerContainerBuilderExtensions
 {
     internal const string TemporalServerImageName = "temporalio/admin-tools";
-    internal const string TemporalServerImageTag = "1.28.2-tctl-1.18.1-cli-1.1.1";
+    internal const string TemporalServerImageTag = "1.30.1";
 
     /// <summary>
     /// Adds a Temporal dev server as a container resource.

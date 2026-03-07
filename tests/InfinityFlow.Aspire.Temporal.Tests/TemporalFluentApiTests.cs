@@ -123,4 +123,46 @@ public class TemporalFluentApiTests
         var annotation = temporal.Resource.Annotations.OfType<TemporalHeadlessAnnotation>().Single();
         Assert.True(annotation.Headless);
     }
+
+    [Fact]
+    public void WithLogConfig_AddsAnnotation()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerContainer("test")
+            .WithLogConfig();
+        var annotation = temporal.Resource.Annotations.OfType<TemporalLogConfigAnnotation>().Single();
+        Assert.True(annotation.Enabled);
+    }
+
+    [Fact]
+    public void WithSearchAttribute_AddsAnnotation()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerContainer("test")
+            .WithSearchAttribute("MyAttr", SearchAttributeType.Keyword);
+        var annotation = temporal.Resource.Annotations.OfType<TemporalSearchAttributeAnnotation>().Single();
+        Assert.Equal("MyAttr", annotation.Key);
+        Assert.Equal(SearchAttributeType.Keyword, annotation.Type);
+    }
+
+    [Fact]
+    public void WithSearchAttribute_SupportsMultiple()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerContainer("test")
+            .WithSearchAttribute("Attr1", SearchAttributeType.Text)
+            .WithSearchAttribute("Attr2", SearchAttributeType.Int);
+        var annotations = temporal.Resource.Annotations.OfType<TemporalSearchAttributeAnnotation>().ToList();
+        Assert.Equal(2, annotations.Count);
+    }
+
+    [Fact]
+    public void WithUiPublicPath_AddsAnnotation()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerContainer("test")
+            .WithUiPublicPath("/temporal");
+        var annotation = temporal.Resource.Annotations.OfType<TemporalUiPublicPathAnnotation>().Single();
+        Assert.Equal("/temporal", annotation.PublicPath);
+    }
 }

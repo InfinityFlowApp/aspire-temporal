@@ -65,6 +65,28 @@ public class AnnotationTests
     }
 
     [Fact]
+    public void TemporalLogConfigAnnotation_StoresValue()
+    {
+        var annotation = new TemporalLogConfigAnnotation(true);
+        Assert.True(annotation.Enabled);
+    }
+
+    [Fact]
+    public void TemporalSearchAttributeAnnotation_StoresKeyAndType()
+    {
+        var annotation = new TemporalSearchAttributeAnnotation("MyAttr", SearchAttributeType.Keyword);
+        Assert.Equal("MyAttr", annotation.Key);
+        Assert.Equal(SearchAttributeType.Keyword, annotation.Type);
+    }
+
+    [Fact]
+    public void TemporalUiPublicPathAnnotation_StoresValue()
+    {
+        var annotation = new TemporalUiPublicPathAnnotation("/temporal");
+        Assert.Equal("/temporal", annotation.PublicPath);
+    }
+
+    [Fact]
     public void AllAnnotations_ImplementIResourceAnnotation()
     {
         Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalLogFormatAnnotation(LogFormat.Json));
@@ -78,5 +100,8 @@ public class AnnotationTests
         Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalSQLitePragmaAnnotation(SQLitePragma.JournalMode));
         Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalNamespaceAnnotation("ns"));
         Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalDynamicConfigAnnotation("k", "v"));
+        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalLogConfigAnnotation(true));
+        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalSearchAttributeAnnotation("k", SearchAttributeType.Text));
+        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalUiPublicPathAnnotation("/path"));
     }
 }

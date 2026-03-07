@@ -148,6 +148,57 @@ public class TemporalArgsBuilderTests
     }
 
     [Fact]
+    public void BuildArgs_WithLogConfig_IncludesFlag()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalLogConfigAnnotation(true));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--log-config", args);
+    }
+
+    [Fact]
+    public void BuildArgs_WithLogConfig_Disabled_DoesNotIncludeFlag()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalLogConfigAnnotation(false));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.DoesNotContain("--log-config", args);
+    }
+
+    [Fact]
+    public void BuildArgs_WithSearchAttribute_IncludesFlag()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalSearchAttributeAnnotation("MyAttr", SearchAttributeType.Keyword));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--search-attribute", args);
+        Assert.Contains("MyAttr=Keyword", args);
+    }
+
+    [Fact]
+    public void BuildArgs_WithMultipleSearchAttributes_IncludesAll()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalSearchAttributeAnnotation("Attr1", SearchAttributeType.Text));
+        resource.Annotations.Add(new TemporalSearchAttributeAnnotation("Attr2", SearchAttributeType.Bool));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        var saFlags = args.Count(a => a == "--search-attribute");
+        Assert.Equal(2, saFlags);
+        Assert.Contains("Attr1=Text", args);
+        Assert.Contains("Attr2=Bool", args);
+    }
+
+    [Fact]
+    public void BuildArgs_WithUiPublicPath_IncludesFlag()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalUiPublicPathAnnotation("/temporal"));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--ui-public-path", args);
+        Assert.Contains("/temporal", args);
+    }
+
+    [Fact]
     public void BuildArgs_WithSQLitePragma_IncludesFlag()
     {
         var resource = new TemporalServerContainerResource("test");

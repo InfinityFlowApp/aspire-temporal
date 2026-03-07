@@ -21,6 +21,17 @@ public enum SQLitePragma
     Synchronous
 }
 
+public enum SearchAttributeType
+{
+    Text,
+    Keyword,
+    Int,
+    Double,
+    Bool,
+    Datetime,
+    KeywordList
+}
+
 public static class EnumHelpers
 {
     public static string LogFormatToString(LogFormat logFormat) => logFormat switch
@@ -45,5 +56,17 @@ public static class EnumHelpers
         SQLitePragma.JournalMode => "journal_mode",
         SQLitePragma.Synchronous => "synchronous",
         _ => throw new ArgumentOutOfRangeException(nameof(pragma), pragma, null),
+    };
+
+    public static string SearchAttributeTypeToString(SearchAttributeType type) => type switch
+    {
+        SearchAttributeType.Text => "Text",
+        SearchAttributeType.Keyword => "Keyword",
+        SearchAttributeType.Int => "Int",
+        SearchAttributeType.Double => "Double",
+        SearchAttributeType.Bool => "Bool",
+        SearchAttributeType.Datetime => "Datetime",
+        SearchAttributeType.KeywordList => "KeywordList",
+        _ => throw new ArgumentOutOfRangeException(nameof(type), type, null),
     };
 }
