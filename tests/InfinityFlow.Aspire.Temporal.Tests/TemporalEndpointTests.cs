@@ -145,4 +145,68 @@ public class TemporalEndpointTests
             .Single(e => e.Name == "server");
         Assert.Equal(7233, serverEndpoint.Port);
     }
+
+    [Fact]
+    public void AddTemporalServerExecutable_WithUiPort_SetsFixedPort()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerExecutable("temporal")
+            .WithUiPort(8233);
+
+        var uiEndpoint = temporal.Resource.Annotations.OfType<EndpointAnnotation>()
+            .Single(e => e.Name == "ui");
+        Assert.Equal(8233, uiEndpoint.Port);
+    }
+
+    [Fact]
+    public void AddTemporalServerExecutable_WithMetricsEndpoint_AddsEndpoint()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerExecutable("temporal")
+            .WithMetricsEndpoint(9090);
+
+        var metricsEndpoint = temporal.Resource.Annotations.OfType<EndpointAnnotation>()
+            .SingleOrDefault(e => e.Name == "metrics");
+        Assert.NotNull(metricsEndpoint);
+        Assert.Equal(9090, metricsEndpoint.Port);
+        Assert.Null(metricsEndpoint.TargetPort);
+    }
+
+    [Fact]
+    public void AddTemporalServerExecutable_WithHttpPort_AddsEndpoint()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerExecutable("temporal")
+            .WithHttpPort(7234);
+
+        var httpEndpoint = temporal.Resource.Annotations.OfType<EndpointAnnotation>()
+            .SingleOrDefault(e => e.Name == "http");
+        Assert.NotNull(httpEndpoint);
+        Assert.Equal(7234, httpEndpoint.Port);
+        Assert.Null(httpEndpoint.TargetPort);
+    }
+
+    [Fact]
+    public void AddTemporalServerExecutable_WithHeadlessUi_NoUiEndpoint()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerExecutable("temporal")
+            .WithHeadlessUi();
+
+        var uiEndpoint = temporal.Resource.Annotations.OfType<EndpointAnnotation>()
+            .SingleOrDefault(e => e.Name == "ui");
+        Assert.Null(uiEndpoint);
+    }
+
+    [Fact]
+    public void AddTemporalServerExecutable_ArgsPassedToExecutable()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerExecutable("temporal")
+            .WithLogFormat(LogFormat.Json);
+
+        var argsAnnotations = temporal.Resource.Annotations.OfType<CommandLineArgsCallbackAnnotation>();
+        Assert.NotEmpty(argsAnnotations);
+    }
+
 }

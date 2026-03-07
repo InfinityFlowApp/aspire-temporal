@@ -83,4 +83,44 @@ public class TemporalFluentApiTests
         Assert.Single(temporal.Resource.Annotations.OfType<TemporalLogFormatAnnotation>());
         Assert.Single(temporal.Resource.Annotations.OfType<TemporalNamespaceAnnotation>());
     }
+
+    [Fact]
+    public void WithUiIp_AddsAnnotation()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerContainer("test")
+            .WithUiIp("192.168.1.1");
+        var annotation = temporal.Resource.Annotations.OfType<TemporalUiIpAnnotation>().Single();
+        Assert.Equal("192.168.1.1", annotation.UiIp);
+    }
+
+    [Fact]
+    public void WithUiAssetPath_AddsAnnotation()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerContainer("test")
+            .WithUiAssetPath("/custom/assets");
+        var annotation = temporal.Resource.Annotations.OfType<TemporalUiAssetPathAnnotation>().Single();
+        Assert.Equal("/custom/assets", annotation.AssetPath);
+    }
+
+    [Fact]
+    public void WithUiCodecEndpoint_AddsAnnotation()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerContainer("test")
+            .WithUiCodecEndpoint("http://codec:8080");
+        var annotation = temporal.Resource.Annotations.OfType<TemporalUiCodecEndpointAnnotation>().Single();
+        Assert.Equal("http://codec:8080", annotation.CodecEndpoint);
+    }
+
+    [Fact]
+    public void WithHeadlessUi_AddsAnnotation_OnExecutable()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerExecutable("test")
+            .WithHeadlessUi();
+        var annotation = temporal.Resource.Annotations.OfType<TemporalHeadlessAnnotation>().Single();
+        Assert.True(annotation.Headless);
+    }
 }

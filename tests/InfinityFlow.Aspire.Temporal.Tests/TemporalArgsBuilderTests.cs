@@ -110,6 +110,36 @@ public class TemporalArgsBuilderTests
     }
 
     [Fact]
+    public void BuildArgs_WithDynamicConfig_Float_IncludesFlag()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalDynamicConfigAnnotation("ratio", 1.5f));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--dynamic-config-value", args);
+        Assert.Contains(args, a => a.StartsWith("ratio="));
+    }
+
+    [Fact]
+    public void BuildArgs_WithDynamicConfig_Double_IncludesFlag()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalDynamicConfigAnnotation("ratio", 2.5d));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--dynamic-config-value", args);
+        Assert.Contains(args, a => a.StartsWith("ratio="));
+    }
+
+    [Fact]
+    public void BuildArgs_WithDynamicConfig_Long_IncludesFlag()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalDynamicConfigAnnotation("bignum", 9999999999L));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--dynamic-config-value", args);
+        Assert.Contains("bignum=9999999999", args);
+    }
+
+    [Fact]
     public void BuildArgs_WithDynamicConfig_UnsupportedType_Throws()
     {
         var resource = new TemporalServerContainerResource("test");
