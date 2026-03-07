@@ -29,7 +29,8 @@ public static class TemporalServerContainerBuilderExtensions
                     ctx.Args.Add(arg);
             })
             .WithHttpsEndpoint(name: "server", targetPort: 7233).AsHttp2Service()
-            .WithHttpEndpoint(name: "ui", targetPort: 8233);
+            .WithHttpEndpoint(name: "ui", targetPort: 8233)
+            .WithOtlpExporter();
 
         return resourceBuilder;
     }
