@@ -163,8 +163,7 @@ builder.AddTemporalServerContainer("temporal")
     .WithDynamicConfigValue("key", value)             // --dynamic-config-value
     .WithLogConfig(true)                               // --log-config
     .WithSearchAttribute("MyKey", SearchAttributeType.Keyword) // --search-attribute
-    .WithUiPublicPath("/temporal")                     // --ui-public-path
-    .WithImageTag("latest");                          // custom image tag
+    .WithUiPublicPath("/temporal");                    // --ui-public-path
 ```
 
 You can run `temporal server start-dev --help` to get more information about the CLI flags on the dev server.
