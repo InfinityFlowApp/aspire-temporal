@@ -1,33 +1,15 @@
-using System.Diagnostics.Metrics;
-
+using InfinityFlow.Aspire.Temporal.Client;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-
 using Temporalio.Client;
-using Temporalio.Extensions.DiagnosticSource;
-using Temporalio.Extensions.OpenTelemetry;
-using Temporalio.Runtime;
 
 var builder = WebApplication.CreateBuilder(args);
 
-using var meter = new Meter("Temporal.Client");
-
-var runtime = new TemporalRuntime(new()
-{
-    Telemetry = new()
-    {
-        Metrics = new() { CustomMetricMeter = new CustomMetricMeter(meter) },
-    },
-});
-
 builder.AddServiceDefaults();
 
-builder.Services.AddTemporalClient(opts =>
+builder.AddTemporalClient("temporal", opts =>
 {
-    opts.TargetHost = builder.Configuration["ConnectionStrings:temporal"];
     opts.Namespace = Constants.Namespace;
-    opts.Interceptors = [new TracingInterceptor()];
-    opts.Runtime = runtime;
 });
 
 var app = builder.Build();

@@ -1,3 +1,4 @@
+using InfinityFlow.Aspire.Temporal.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,8 +8,6 @@ using Microsoft.Extensions.Logging;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
-
-using Temporalio.Extensions.OpenTelemetry;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -44,8 +43,7 @@ public static class Extensions
 
         builder.Services.AddOpenTelemetry()
             .WithMetrics(metrics => metrics.AddRuntimeInstrumentation()
-                       .AddBuiltInMeters()
-                       .AddMeter("Temporal.Client"))
+                       .AddBuiltInMeters())
             .WithTracing(tracing =>
             {
                 if (builder.Environment.IsDevelopment())
@@ -56,12 +54,10 @@ public static class Extensions
 
                 tracing.AddAspNetCoreInstrumentation()
                        .AddGrpcClientInstrumentation()
-                       .AddHttpClientInstrumentation()
-                       .AddSource(
-                            TracingInterceptor.ClientSource.Name,
-                            TracingInterceptor.WorkflowsSource.Name,
-                            TracingInterceptor.ActivitiesSource.Name);
+                       .AddHttpClientInstrumentation();
             });
+
+        builder.Services.AddTemporalServiceDefaults();
 
         builder.AddOpenTelemetryExporters();
 
