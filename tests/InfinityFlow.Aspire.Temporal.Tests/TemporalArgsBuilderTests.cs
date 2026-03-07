@@ -1,3 +1,4 @@
+using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using InfinityFlow.Aspire.Temporal;
 using InfinityFlow.Aspire.Temporal.Annotations;
@@ -5,78 +6,154 @@ using Xunit;
 
 namespace InfinityFlow.Aspire.Temporal.Tests;
 
-public class AnnotationTests
+public class TemporalArgsBuilderTests
 {
     [Fact]
-    public void TemporalLogFormatAnnotation_StoresValue()
+    public void BuildArgs_NoAnnotations_ReturnsBaseArgs()
     {
-        var annotation = new TemporalLogFormatAnnotation(LogFormat.Json);
-        Assert.Equal(LogFormat.Json, annotation.Format);
+        var resource = new TemporalServerContainerResource("test");
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Equal(["server", "start-dev", "--ip", "0.0.0.0"], args);
     }
 
     [Fact]
-    public void TemporalLogLevelAnnotation_StoresValue()
+    public void BuildArgs_WithLogFormat_IncludesFlag()
     {
-        var annotation = new TemporalLogLevelAnnotation(LogLevel.Info);
-        Assert.Equal(LogLevel.Info, annotation.Level);
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalLogFormatAnnotation(LogFormat.Json));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--log-format", args);
+        Assert.Contains("json", args);
     }
 
     [Fact]
-    public void TemporalNamespaceAnnotation_StoresValue()
+    public void BuildArgs_WithLogLevel_IncludesFlag()
     {
-        var annotation = new TemporalNamespaceAnnotation("test-ns");
-        Assert.Equal("test-ns", annotation.Namespace);
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalLogLevelAnnotation(LogLevel.Warn));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--log-level", args);
+        Assert.Contains("warn", args);
     }
 
     [Fact]
-    public void TemporalDynamicConfigAnnotation_StoresKeyAndValue()
+    public void BuildArgs_WithDbFileName_IncludesFlag()
     {
-        var annotation = new TemporalDynamicConfigAnnotation("key", true);
-        Assert.Equal("key", annotation.Key);
-        Assert.Equal(true, annotation.Value);
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalDbFileNameAnnotation("/tmp/temporal.db"));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--db-filename", args);
+        Assert.Contains("/tmp/temporal.db", args);
     }
 
     [Fact]
-    public void TemporalDbFileNameAnnotation_StoresValue()
+    public void BuildArgs_WithHeadless_IncludesFlag()
     {
-        var annotation = new TemporalDbFileNameAnnotation("/tmp/temporal.db");
-        Assert.Equal("/tmp/temporal.db", annotation.FileName);
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalHeadlessAnnotation(true));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--headless", args);
+        Assert.Contains("true", args);
     }
 
     [Fact]
-    public void TemporalHeadlessAnnotation_StoresValue()
+    public void BuildArgs_WithIp_OverridesDefault()
     {
-        var annotation = new TemporalHeadlessAnnotation(true);
-        Assert.True(annotation.Headless);
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalIpAnnotation("127.0.0.1"));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--ip", args);
+        Assert.Contains("127.0.0.1", args);
+        Assert.DoesNotContain("0.0.0.0", args);
     }
 
     [Fact]
-    public void TemporalIpAnnotation_StoresValue()
+    public void BuildArgs_WithMultipleNamespaces_IncludesAll()
     {
-        var annotation = new TemporalIpAnnotation("127.0.0.1");
-        Assert.Equal("127.0.0.1", annotation.Ip);
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalNamespaceAnnotation("ns1"));
+        resource.Annotations.Add(new TemporalNamespaceAnnotation("ns2"));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        var nsFlags = args.Count(a => a == "--namespace");
+        Assert.Equal(2, nsFlags);
+        Assert.Contains("ns1", args);
+        Assert.Contains("ns2", args);
     }
 
     [Fact]
-    public void TemporalSQLitePragmaAnnotation_StoresValue()
+    public void BuildArgs_WithDynamicConfig_Bool_IncludesFlag()
     {
-        var annotation = new TemporalSQLitePragmaAnnotation(SQLitePragma.JournalMode);
-        Assert.Equal(SQLitePragma.JournalMode, annotation.Pragma);
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalDynamicConfigAnnotation("frontend.enableX", true));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--dynamic-config-value", args);
+        Assert.Contains("frontend.enableX=true", args);
     }
 
     [Fact]
-    public void AllAnnotations_ImplementIResourceAnnotation()
+    public void BuildArgs_WithDynamicConfig_String_IncludesQuotedFlag()
     {
-        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalLogFormatAnnotation(LogFormat.Json));
-        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalLogLevelAnnotation(LogLevel.Info));
-        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalDbFileNameAnnotation("f"));
-        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalHeadlessAnnotation(true));
-        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalIpAnnotation("0.0.0.0"));
-        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalUiIpAnnotation("0.0.0.0"));
-        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalUiAssetPathAnnotation("/path"));
-        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalUiCodecEndpointAnnotation("http://x"));
-        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalSQLitePragmaAnnotation(SQLitePragma.JournalMode));
-        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalNamespaceAnnotation("ns"));
-        Assert.IsAssignableFrom<IResourceAnnotation>(new TemporalDynamicConfigAnnotation("k", "v"));
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalDynamicConfigAnnotation("key", "value"));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--dynamic-config-value", args);
+        Assert.Contains("key=\"value\"", args);
+    }
+
+    [Fact]
+    public void BuildArgs_WithDynamicConfig_Int_IncludesFlag()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalDynamicConfigAnnotation("limit", 100));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("limit=100", args);
+    }
+
+    [Fact]
+    public void BuildArgs_WithDynamicConfig_UnsupportedType_Throws()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalDynamicConfigAnnotation("key", new object()));
+        Assert.Throws<ArgumentException>(() => TemporalServerArgsBuilder.BuildArgs(resource));
+    }
+
+    [Fact]
+    public void BuildArgs_WithSQLitePragma_IncludesFlag()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalSQLitePragmaAnnotation(SQLitePragma.JournalMode));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--sqlite-pragma", args);
+        Assert.Contains("journal_mode", args);
+    }
+
+    [Fact]
+    public void BuildArgs_WithUiIp_IncludesFlag()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalUiIpAnnotation("192.168.1.1"));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--ui-ip", args);
+        Assert.Contains("192.168.1.1", args);
+    }
+
+    [Fact]
+    public void BuildArgs_WithUiAssetPath_IncludesFlag()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalUiAssetPathAnnotation("/assets"));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--ui-asset-path", args);
+        Assert.Contains("/assets", args);
+    }
+
+    [Fact]
+    public void BuildArgs_WithUiCodecEndpoint_IncludesFlag()
+    {
+        var resource = new TemporalServerContainerResource("test");
+        resource.Annotations.Add(new TemporalUiCodecEndpointAnnotation("http://codec:8080"));
+        var args = TemporalServerArgsBuilder.BuildArgs(resource);
+        Assert.Contains("--ui-codec-endpoint", args);
+        Assert.Contains("http://codec:8080", args);
     }
 }
