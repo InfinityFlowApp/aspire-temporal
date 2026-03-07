@@ -485,3 +485,6 @@ $RECYCLE.BIN/
 
 appsettings.Development.json
 temporal.sqlite
+
+# Git worktrees
+.worktrees/
