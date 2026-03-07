@@ -17,7 +17,8 @@ public class TemporalIntegrationTests
     [Fact]
     public async Task SearchAttributes_AreRegisteredOnServer()
     {
-        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.TestAppHost>();
+        var ct = TestContext.Current.CancellationToken;
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.TestAppHost>(ct);
 
         var temporal = builder.AddTemporalServerContainer("temporal-search")
             .WithSearchAttribute("CustomKeyword", SearchAttributeType.Keyword)
@@ -31,13 +32,13 @@ public class TemporalIntegrationTests
         // Temporal gRPC client cannot easily consume in test scenarios.
         temporal.WithEndpoint(scheme: "http", targetPort: 7233, name: "grpc-direct", isProxied: false);
 
-        await using var app = await builder.BuildAsync();
+        await using var app = await builder.BuildAsync(ct);
 
         var rns = app.Services.GetRequiredService<ResourceNotificationService>();
-        await app.StartAsync();
+        await app.StartAsync(ct);
 
-        await rns.WaitForResourceAsync("temporal-search", KnownResourceStates.Running)
-            .WaitAsync(TimeSpan.FromSeconds(120));
+        await rns.WaitForResourceAsync("temporal-search", KnownResourceStates.Running, ct)
+            .WaitAsync(TimeSpan.FromSeconds(120), ct);
 
         var directEndpoint = temporal.Resource.Annotations
             .OfType<EndpointAnnotation>()
@@ -47,7 +48,7 @@ public class TemporalIntegrationTests
         var port = directEndpoint.AllocatedEndpoint!.Port;
 
         // Allow server to fully initialize search attributes
-        await Task.Delay(3000);
+        await Task.Delay(3000, ct);
 
         var client = await TemporalClient.ConnectAsync(
             new TemporalClientConnectOptions($"{address}:{port}")
@@ -67,26 +68,27 @@ public class TemporalIntegrationTests
         Assert.Contains(response.CustomAttributes, kvp =>
             kvp.Key == "CustomDatetime" && kvp.Value == IndexedValueType.Datetime);
 
-        await app.StopAsync();
+        await app.StopAsync(ct);
     }
 
     [Fact]
     public async Task Namespace_IsCreatedOnServer()
     {
-        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.TestAppHost>();
+        var ct = TestContext.Current.CancellationToken;
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.TestAppHost>(ct);
 
         var temporal = builder.AddTemporalServerContainer("temporal-ns")
             .WithNamespace("custom-ns-1", "custom-ns-2");
 
         temporal.WithEndpoint(scheme: "http", targetPort: 7233, name: "grpc-direct", isProxied: false);
 
-        await using var app = await builder.BuildAsync();
+        await using var app = await builder.BuildAsync(ct);
 
         var rns = app.Services.GetRequiredService<ResourceNotificationService>();
-        await app.StartAsync();
+        await app.StartAsync(ct);
 
-        await rns.WaitForResourceAsync("temporal-ns", KnownResourceStates.Running)
-            .WaitAsync(TimeSpan.FromSeconds(120));
+        await rns.WaitForResourceAsync("temporal-ns", KnownResourceStates.Running, ct)
+            .WaitAsync(TimeSpan.FromSeconds(120), ct);
 
         var directEndpoint = temporal.Resource.Annotations
             .OfType<EndpointAnnotation>()
@@ -95,7 +97,7 @@ public class TemporalIntegrationTests
         var address = directEndpoint.AllocatedEndpoint!.Address;
         var port = directEndpoint.AllocatedEndpoint!.Port;
 
-        await Task.Delay(3000);
+        await Task.Delay(3000, ct);
 
         var client = await TemporalClient.ConnectAsync(
             new TemporalClientConnectOptions($"{address}:{port}")
@@ -119,6 +121,6 @@ public class TemporalIntegrationTests
 
         Assert.Equal("custom-ns-2", describeResponse2.NamespaceInfo.Name);
 
-        await app.StopAsync();
+        await app.StopAsync(ct);
     }
 }

@@ -19,7 +19,8 @@ public class TemporalClientIntegrationTests
     [Fact]
     public async Task AddTemporalClient_ResolvesConnectionAndConnects()
     {
-        var (address, port, aspireApp) = await StartTemporalServer();
+        var ct = TestContext.Current.CancellationToken;
+        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
@@ -28,19 +29,20 @@ public class TemporalClientIntegrationTests
         hostBuilder.AddTemporalClient("temporal");
 
         using var host = hostBuilder.Build();
-        await host.StartAsync();
+        await host.StartAsync(ct);
 
         var client = host.Services.GetRequiredService<ITemporalClient>();
         Assert.NotNull(client);
         Assert.Equal($"{address}:{port}", client.Connection.Options.TargetHost);
 
-        await host.StopAsync();
+        await host.StopAsync(ct);
     }
 
     [Fact]
     public async Task AddTemporalClient_ConfigureClientSetsNamespace()
     {
-        var (address, port, aspireApp) = await StartTemporalServer();
+        var ct = TestContext.Current.CancellationToken;
+        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
@@ -52,18 +54,19 @@ public class TemporalClientIntegrationTests
         });
 
         using var host = hostBuilder.Build();
-        await host.StartAsync();
+        await host.StartAsync(ct);
 
         var client = host.Services.GetRequiredService<ITemporalClient>();
         Assert.Equal("custom-ns", client.Options.Namespace);
 
-        await host.StopAsync();
+        await host.StopAsync(ct);
     }
 
     [Fact]
     public async Task AddTemporalClient_ConfigureOptionsApplies()
     {
-        var (address, port, aspireApp) = await StartTemporalServer();
+        var ct = TestContext.Current.CancellationToken;
+        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
@@ -73,18 +76,19 @@ public class TemporalClientIntegrationTests
             .ConfigureOptions(opts => opts.Namespace = "configured-ns");
 
         using var host = hostBuilder.Build();
-        await host.StartAsync();
+        await host.StartAsync(ct);
 
         var client = host.Services.GetRequiredService<ITemporalClient>();
         Assert.Equal("configured-ns", client.Options.Namespace);
 
-        await host.StopAsync();
+        await host.StopAsync(ct);
     }
 
     [Fact]
     public async Task HealthCheck_ReturnsHealthy_WhenConnected()
     {
-        var (address, port, aspireApp) = await StartTemporalServer();
+        var ct = TestContext.Current.CancellationToken;
+        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
@@ -93,21 +97,22 @@ public class TemporalClientIntegrationTests
         hostBuilder.AddTemporalClient("temporal");
 
         using var host = hostBuilder.Build();
-        await host.StartAsync();
+        await host.StartAsync(ct);
 
         var healthCheckService = host.Services.GetRequiredService<HealthCheckService>();
-        var result = await healthCheckService.CheckHealthAsync();
+        var result = await healthCheckService.CheckHealthAsync(ct);
 
         Assert.Equal(HealthStatus.Healthy, result.Status);
         Assert.Contains(result.Entries, e => e.Key == "temporal-temporal");
 
-        await host.StopAsync();
+        await host.StopAsync(ct);
     }
 
     [Fact]
     public async Task AddTemporalWorker_RegistersWorkflowAndActivities()
     {
-        var (address, port, aspireApp) = await StartTemporalServer();
+        var ct = TestContext.Current.CancellationToken;
+        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
@@ -118,18 +123,19 @@ public class TemporalClientIntegrationTests
             .AddScopedActivities<TestActivities>();
 
         using var host = hostBuilder.Build();
-        await host.StartAsync();
+        await host.StartAsync(ct);
 
         var client = host.Services.GetRequiredService<ITemporalClient>();
         Assert.NotNull(client);
 
-        await host.StopAsync();
+        await host.StopAsync(ct);
     }
 
     [Fact]
     public async Task AddTemporalWorker_ExecutesWorkflow()
     {
-        var (address, port, aspireApp) = await StartTemporalServer();
+        var ct = TestContext.Current.CancellationToken;
+        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
@@ -140,7 +146,7 @@ public class TemporalClientIntegrationTests
             .AddScopedActivities<TestActivities>();
 
         using var host = hostBuilder.Build();
-        await host.StartAsync();
+        await host.StartAsync(ct);
 
         var client = host.Services.GetRequiredService<ITemporalClient>();
 
@@ -150,13 +156,14 @@ public class TemporalClientIntegrationTests
 
         Assert.Equal("Hello world", result);
 
-        await host.StopAsync();
+        await host.StopAsync(ct);
     }
 
     [Fact]
     public async Task AddTemporalWorker_TransientActivities()
     {
-        var (address, port, aspireApp) = await StartTemporalServer();
+        var ct = TestContext.Current.CancellationToken;
+        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
@@ -167,7 +174,7 @@ public class TemporalClientIntegrationTests
             .AddTransientActivities<TestActivities>();
 
         using var host = hostBuilder.Build();
-        await host.StartAsync();
+        await host.StartAsync(ct);
 
         var client = host.Services.GetRequiredService<ITemporalClient>();
 
@@ -177,13 +184,14 @@ public class TemporalClientIntegrationTests
 
         Assert.Equal("Hello transient", result);
 
-        await host.StopAsync();
+        await host.StopAsync(ct);
     }
 
     [Fact]
     public async Task AddTemporalWorker_SingletonActivities()
     {
-        var (address, port, aspireApp) = await StartTemporalServer();
+        var ct = TestContext.Current.CancellationToken;
+        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
@@ -194,7 +202,7 @@ public class TemporalClientIntegrationTests
             .AddSingletonActivities<TestActivities>();
 
         using var host = hostBuilder.Build();
-        await host.StartAsync();
+        await host.StartAsync(ct);
 
         var client = host.Services.GetRequiredService<ITemporalClient>();
 
@@ -204,13 +212,14 @@ public class TemporalClientIntegrationTests
 
         Assert.Equal("Hello singleton", result);
 
-        await host.StopAsync();
+        await host.StopAsync(ct);
     }
 
     [Fact]
     public async Task AddTemporalWorker_ActivitiesInstance()
     {
-        var (address, port, aspireApp) = await StartTemporalServer();
+        var ct = TestContext.Current.CancellationToken;
+        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
@@ -221,7 +230,7 @@ public class TemporalClientIntegrationTests
             .AddActivitiesInstance(new TestActivities());
 
         using var host = hostBuilder.Build();
-        await host.StartAsync();
+        await host.StartAsync(ct);
 
         var client = host.Services.GetRequiredService<ITemporalClient>();
 
@@ -231,7 +240,7 @@ public class TemporalClientIntegrationTests
 
         Assert.Equal("Hello instance", result);
 
-        await host.StopAsync();
+        await host.StopAsync(ct);
     }
 
     /// <summary>
@@ -239,21 +248,22 @@ public class TemporalClientIntegrationTests
     /// Each test gets a uniquely named resource to avoid container conflicts.
     /// </summary>
     private static async Task<(string Address, int Port, DistributedApplication App)> StartTemporalServer(
-        [System.Runtime.CompilerServices.CallerMemberName] string callerName = "")
+        [System.Runtime.CompilerServices.CallerMemberName] string callerName = "",
+        CancellationToken cancellationToken = default)
     {
         var resourceName = $"t-{callerName}".ToLowerInvariant().Replace("_", "-");
-        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.TestAppHost>();
+        var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.TestAppHost>(cancellationToken);
 
         var temporal = builder.AddTemporalServerContainer(resourceName);
         temporal.WithEndpoint(scheme: "http", targetPort: 7233, name: "grpc-direct", isProxied: false);
 
-        var app = await builder.BuildAsync();
+        var app = await builder.BuildAsync(cancellationToken);
 
         var rns = app.Services.GetRequiredService<ResourceNotificationService>();
-        await app.StartAsync();
+        await app.StartAsync(cancellationToken);
 
-        await rns.WaitForResourceAsync(resourceName, KnownResourceStates.Running)
-            .WaitAsync(TimeSpan.FromSeconds(120));
+        await rns.WaitForResourceAsync(resourceName, KnownResourceStates.Running, cancellationToken)
+            .WaitAsync(TimeSpan.FromSeconds(120), cancellationToken);
 
         var directEndpoint = temporal.Resource.Annotations
             .OfType<EndpointAnnotation>()
@@ -263,7 +273,7 @@ public class TemporalClientIntegrationTests
         var port = directEndpoint.AllocatedEndpoint!.Port;
 
         // Allow server to fully initialize
-        await Task.Delay(3000);
+        await Task.Delay(3000, cancellationToken);
 
         return (address, port, app);
     }

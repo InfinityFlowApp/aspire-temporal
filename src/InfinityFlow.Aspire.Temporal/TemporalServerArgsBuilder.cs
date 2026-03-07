@@ -3,8 +3,10 @@ using InfinityFlow.Aspire.Temporal.Annotations;
 
 namespace InfinityFlow.Aspire.Temporal;
 
+/// <summary>Builds CLI arguments from resource annotations for the Temporal dev server.</summary>
 public static class TemporalServerArgsBuilder
 {
+    /// <summary>Reads annotations from the resource and returns the CLI argument array.</summary>
     public static string[] BuildArgs(IResource resource)
     {
         var result = new List<string> { "server", "start-dev" };
