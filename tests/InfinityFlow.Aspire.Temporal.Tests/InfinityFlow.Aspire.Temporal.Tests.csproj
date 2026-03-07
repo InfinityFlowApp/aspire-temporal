@@ -15,5 +15,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\InfinityFlow.Aspire.Temporal\InfinityFlow.Aspire.Temporal.csproj" />
     <ProjectReference Include="..\..\src\InfinityFlow.Aspire.Temporal.Client\InfinityFlow.Aspire.Temporal.Client.csproj" />
+    <ProjectReference Include="..\TestAppHost\TestAppHost.csproj" />
   </ItemGroup>
 </Project>

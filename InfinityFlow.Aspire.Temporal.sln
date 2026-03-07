@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfinityFlow.Aspire.Tempora
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfinityFlow.Aspire.Temporal.Client", "src\InfinityFlow.Aspire.Temporal.Client\InfinityFlow.Aspire.Temporal.Client.csproj", "{C29E4F50-7D2A-4FF9-83B5-728A6EEC3F21}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAppHost", "tests\TestAppHost\TestAppHost.csproj", "{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +119,18 @@ Global
 		{C29E4F50-7D2A-4FF9-83B5-728A6EEC3F21}.Release|x64.Build.0 = Release|Any CPU
 		{C29E4F50-7D2A-4FF9-83B5-728A6EEC3F21}.Release|x86.ActiveCfg = Release|Any CPU
 		{C29E4F50-7D2A-4FF9-83B5-728A6EEC3F21}.Release|x86.Build.0 = Release|Any CPU
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}.Debug|x64.Build.0 = Debug|Any CPU
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}.Debug|x86.Build.0 = Debug|Any CPU
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}.Release|x64.ActiveCfg = Release|Any CPU
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}.Release|x64.Build.0 = Release|Any CPU
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}.Release|x86.ActiveCfg = Release|Any CPU
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -129,6 +143,7 @@ Global
 		{8B68A40A-674D-4989-B366-1EE0A633F0D9} = {0815F1E4-424A-4A05-A12E-B2BDAF2AA142}
 		{4EEF5136-5452-4D0F-9766-B5080E885A20} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{C29E4F50-7D2A-4FF9-83B5-728A6EEC3F21} = {70F8209F-4A68-4F27-AF37-3A76C8EA0642}
+		{D0F86CD9-CF13-4E27-BCAF-46847E8C7F33} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C4C2C7A9-980A-4B6D-A624-60A0FBD99DE0}
