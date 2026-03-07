@@ -221,4 +221,28 @@ public class TemporalFluentApiTests
         Assert.Equal(ContainerMountType.BindMount, mount.Type);
         Assert.Equal("/host/data", mount.Source);
     }
+
+    [Fact]
+    public void WithDataVolume_UpsertsDbFileNameAnnotation()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerContainer("test")
+            .WithDbFileName("/custom/path.db")
+            .WithDataVolume();
+        var annotations = temporal.Resource.Annotations.OfType<TemporalDbFileNameAnnotation>().ToList();
+        Assert.Single(annotations);
+        Assert.Equal("/data/temporal.db", annotations[0].FileName);
+    }
+
+    [Fact]
+    public void WithDataBindMount_UpsertsDbFileNameAnnotation()
+    {
+        var builder = DistributedApplication.CreateBuilder();
+        var temporal = builder.AddTemporalServerContainer("test")
+            .WithDbFileName("/custom/path.db")
+            .WithDataBindMount("/host/data");
+        var annotations = temporal.Resource.Annotations.OfType<TemporalDbFileNameAnnotation>().ToList();
+        Assert.Single(annotations);
+        Assert.Equal("/data/temporal.db", annotations[0].FileName);
+    }
 }

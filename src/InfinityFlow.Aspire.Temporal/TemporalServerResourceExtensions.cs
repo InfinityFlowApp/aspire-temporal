@@ -176,6 +176,9 @@ public static class TemporalServerResourceExtensions
     public static IResourceBuilder<TemporalServerContainerResource> WithDataVolume(
         this IResourceBuilder<TemporalServerContainerResource> builder, string? name = null, bool isReadOnly = false)
     {
+        var existing = builder.Resource.Annotations.OfType<TemporalDbFileNameAnnotation>().FirstOrDefault();
+        if (existing is not null)
+            builder.Resource.Annotations.Remove(existing);
         builder.Resource.Annotations.Add(new TemporalDbFileNameAnnotation("/data/temporal.db"));
         return builder.WithVolume(name ?? VolumeNameGenerator.Generate(builder, "data"), "/data", isReadOnly);
     }
@@ -188,6 +191,9 @@ public static class TemporalServerResourceExtensions
     public static IResourceBuilder<TemporalServerContainerResource> WithDataBindMount(
         this IResourceBuilder<TemporalServerContainerResource> builder, string source, bool isReadOnly = false)
     {
+        var existing = builder.Resource.Annotations.OfType<TemporalDbFileNameAnnotation>().FirstOrDefault();
+        if (existing is not null)
+            builder.Resource.Annotations.Remove(existing);
         builder.Resource.Annotations.Add(new TemporalDbFileNameAnnotation("/data/temporal.db"));
         return builder.WithBindMount(source, "/data", isReadOnly);
     }
