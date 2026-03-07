@@ -17,8 +17,12 @@
     <RepositoryUrl>https://github.com/InfinityFlowApp/aspire-temporal-server</RepositoryUrl>
     <Authors>InfinityFlow</Authors>
     <Copyright>Copyright ©️ InfinityFlow</Copyright>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="InfinityFlow.Aspire.Temporal.Tests" />
