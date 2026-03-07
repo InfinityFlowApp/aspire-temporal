@@ -29,29 +29,29 @@ public class TemporalEndpointTests
     }
 
     [Fact]
-    public void AddTemporalServerContainer_WithServicePort_SetsFixedPort()
+    public void AddTemporalServerContainer_WithServicePort_SetsExternalPortOnly()
     {
         var builder = DistributedApplication.CreateBuilder();
         var temporal = builder.AddTemporalServerContainer("temporal")
-            .WithServicePort(7233);
+            .WithServicePort(12345);
 
         var serverEndpoint = temporal.Resource.Annotations.OfType<EndpointAnnotation>()
             .Single(e => e.Name == "server");
-        Assert.Equal(7233, serverEndpoint.Port);
-        Assert.Equal(7233, serverEndpoint.TargetPort);
+        Assert.Equal(12345, serverEndpoint.Port);
+        Assert.Equal(7233, serverEndpoint.TargetPort); // Internal container port is always 7233
     }
 
     [Fact]
-    public void AddTemporalServerContainer_WithUiPort_SetsFixedPort()
+    public void AddTemporalServerContainer_WithUiPort_SetsExternalPortOnly()
     {
         var builder = DistributedApplication.CreateBuilder();
         var temporal = builder.AddTemporalServerContainer("temporal")
-            .WithUiPort(8233);
+            .WithUiPort(23456);
 
         var uiEndpoint = temporal.Resource.Annotations.OfType<EndpointAnnotation>()
             .Single(e => e.Name == "ui");
-        Assert.Equal(8233, uiEndpoint.Port);
-        Assert.Equal(8233, uiEndpoint.TargetPort);
+        Assert.Equal(23456, uiEndpoint.Port);
+        Assert.Equal(8233, uiEndpoint.TargetPort); // Internal container port is always 8233
     }
 
     [Fact]

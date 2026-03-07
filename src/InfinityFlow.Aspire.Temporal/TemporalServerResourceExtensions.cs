@@ -116,25 +116,25 @@ public static class TemporalServerResourceExtensions
 
     // --- Container-specific endpoint methods ---
 
-    /// <summary>Sets the gRPC service port for the Temporal container.</summary>
+    /// <summary>Sets the external gRPC service port for the Temporal container.
+    /// The internal container port is always 7233.</summary>
     public static IResourceBuilder<TemporalServerContainerResource> WithServicePort(
         this IResourceBuilder<TemporalServerContainerResource> builder, int port)
     {
         var endpoint = builder.Resource.Annotations.OfType<EndpointAnnotation>()
             .Single(e => e.Name == "server");
         endpoint.Port = port;
-        endpoint.TargetPort = port;
         return builder;
     }
 
-    /// <summary>Sets the UI port for the Temporal container.</summary>
+    /// <summary>Sets the external UI port for the Temporal container.
+    /// The internal container port is always 8233.</summary>
     public static IResourceBuilder<TemporalServerContainerResource> WithUiPort(
         this IResourceBuilder<TemporalServerContainerResource> builder, int port)
     {
         var endpoint = builder.Resource.Annotations.OfType<EndpointAnnotation>()
             .Single(e => e.Name == "ui");
         endpoint.Port = port;
-        endpoint.TargetPort = port;
         return builder;
     }
 
