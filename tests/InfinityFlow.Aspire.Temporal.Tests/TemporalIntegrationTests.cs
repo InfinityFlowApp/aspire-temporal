@@ -2,7 +2,6 @@ using Aspire.Hosting;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using InfinityFlow.Aspire.Temporal;
-using InfinityFlow.Aspire.Temporal.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Temporalio.Api.Enums.V1;
 using Temporalio.Api.OperatorService.V1;
@@ -11,6 +10,7 @@ using Xunit;
 
 namespace InfinityFlow.Aspire.Temporal.Tests;
 
+[Collection("Integration")]
 [Trait("Category", "Integration")]
 public class TemporalIntegrationTests
 {
@@ -27,10 +27,8 @@ public class TemporalIntegrationTests
             .WithSearchAttribute("CustomDatetime", SearchAttributeType.Datetime)
             .WithNamespace("integration-test");
 
-        // Add a non-proxied HTTP endpoint for direct gRPC access in tests.
-        // The main HTTPS endpoint uses an Aspire TLS proxy, which the
-        // Temporal gRPC client cannot easily consume in test scenarios.
-        temporal.WithEndpoint(scheme: "http", targetPort: 7233, name: "grpc-direct", isProxied: false);
+        // Make the server endpoint non-proxied so the Temporal gRPC client can connect directly.
+        temporal.WithEndpoint("server", e => { e.IsProxied = false; e.UriScheme = "http"; });
 
         await using var app = await builder.BuildAsync(ct);
 
@@ -40,18 +38,14 @@ public class TemporalIntegrationTests
         await rns.WaitForResourceAsync("temporal-search", KnownResourceStates.Running, ct)
             .WaitAsync(TimeSpan.FromSeconds(120), ct);
 
-        var directEndpoint = temporal.Resource.Annotations
-            .OfType<EndpointAnnotation>()
-            .Single(e => e.Name == "grpc-direct");
-
-        var address = directEndpoint.AllocatedEndpoint!.Address;
-        var port = directEndpoint.AllocatedEndpoint!.Port;
+        var serverEndpoint = temporal.GetEndpoint("server");
+        var uri = new Uri(serverEndpoint.Url);
 
         // Allow server to fully initialize search attributes
         await Task.Delay(3000, ct);
 
         var client = await TemporalClient.ConnectAsync(
-            new TemporalClientConnectOptions($"{address}:{port}")
+            new TemporalClientConnectOptions($"{uri.Host}:{uri.Port}")
             {
                 Namespace = "default",
             });
@@ -80,7 +74,7 @@ public class TemporalIntegrationTests
         var temporal = builder.AddTemporalServerContainer("temporal-ns")
             .WithNamespace("custom-ns-1", "custom-ns-2");
 
-        temporal.WithEndpoint(scheme: "http", targetPort: 7233, name: "grpc-direct", isProxied: false);
+        temporal.WithEndpoint("server", e => { e.IsProxied = false; e.UriScheme = "http"; });
 
         await using var app = await builder.BuildAsync(ct);
 
@@ -90,17 +84,13 @@ public class TemporalIntegrationTests
         await rns.WaitForResourceAsync("temporal-ns", KnownResourceStates.Running, ct)
             .WaitAsync(TimeSpan.FromSeconds(120), ct);
 
-        var directEndpoint = temporal.Resource.Annotations
-            .OfType<EndpointAnnotation>()
-            .Single(e => e.Name == "grpc-direct");
-
-        var address = directEndpoint.AllocatedEndpoint!.Address;
-        var port = directEndpoint.AllocatedEndpoint!.Port;
+        var serverEndpoint = temporal.GetEndpoint("server");
+        var uri = new Uri(serverEndpoint.Url);
 
         await Task.Delay(3000, ct);
 
         var client = await TemporalClient.ConnectAsync(
-            new TemporalClientConnectOptions($"{address}:{port}")
+            new TemporalClientConnectOptions($"{uri.Host}:{uri.Port}")
             {
                 Namespace = "custom-ns-1",
             });

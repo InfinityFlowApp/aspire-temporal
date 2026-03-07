@@ -168,6 +168,47 @@ public static class TemporalServerResourceExtensions
         return builder;
     }
 
+    /// <summary>Adds a named volume for Temporal's SQLite data and configures persistence.
+    /// If <see cref="WithDbFileName{T}"/> was called, the volume mounts to that file's directory.
+    /// Otherwise defaults to <c>/data/temporal.db</c>.</summary>
+    /// <param name="builder">The resource builder.</param>
+    /// <param name="name">The volume name. Defaults to an auto-generated name based on the application and resource names.</param>
+    /// <param name="isReadOnly">A flag that indicates if this is a read-only volume.</param>
+    public static IResourceBuilder<TemporalServerContainerResource> WithDataVolume(
+        this IResourceBuilder<TemporalServerContainerResource> builder, string? name = null, bool isReadOnly = false)
+    {
+        var (_, mountPath) = ResolveDbPath(builder);
+        return builder.WithVolume(name ?? VolumeNameGenerator.Generate(builder, "data"), mountPath, isReadOnly);
+    }
+
+    /// <summary>Adds a bind mount for Temporal's SQLite data and configures persistence.
+    /// If <see cref="WithDbFileName{T}"/> was called, the bind mount targets that file's directory.
+    /// Otherwise defaults to <c>/data/temporal.db</c>.</summary>
+    /// <param name="builder">The resource builder.</param>
+    /// <param name="source">The source directory on the host to mount into the container.</param>
+    /// <param name="isReadOnly">A flag that indicates if this is a read-only mount.</param>
+    public static IResourceBuilder<TemporalServerContainerResource> WithDataBindMount(
+        this IResourceBuilder<TemporalServerContainerResource> builder, string source, bool isReadOnly = false)
+    {
+        var (_, mountPath) = ResolveDbPath(builder);
+        return builder.WithBindMount(source, mountPath, isReadOnly);
+    }
+
+    private static (string DbFileName, string MountPath) ResolveDbPath(
+        IResourceBuilder<TemporalServerContainerResource> builder)
+    {
+        var existing = builder.Resource.Annotations.OfType<TemporalDbFileNameAnnotation>().LastOrDefault();
+        if (existing is not null)
+        {
+            var dir = Path.GetDirectoryName(existing.FileName) ?? "/data";
+            return (existing.FileName, dir);
+        }
+
+        const string defaultDbPath = "/data/temporal.db";
+        builder.Resource.Annotations.Add(new TemporalDbFileNameAnnotation(defaultDbPath));
+        return (defaultDbPath, "/data");
+    }
+
     // --- Executable-specific endpoint methods ---
 
     /// <summary>Sets the gRPC service port for the Temporal executable.</summary>

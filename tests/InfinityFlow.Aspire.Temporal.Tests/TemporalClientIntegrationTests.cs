@@ -13,6 +13,7 @@ using Xunit;
 
 namespace InfinityFlow.Aspire.Temporal.Tests;
 
+[Collection("Integration")]
 [Trait("Category", "Integration")]
 public class TemporalClientIntegrationTests
 {
@@ -20,11 +21,11 @@ public class TemporalClientIntegrationTests
     public async Task AddTemporalClient_ResolvesConnectionAndConnects()
     {
         var ct = TestContext.Current.CancellationToken;
-        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
+        var (targetHost, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
-        hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
+        hostBuilder.Configuration["ConnectionStrings:temporal"] = targetHost;
 
         hostBuilder.AddTemporalClient("temporal");
 
@@ -33,7 +34,7 @@ public class TemporalClientIntegrationTests
 
         var client = host.Services.GetRequiredService<ITemporalClient>();
         Assert.NotNull(client);
-        Assert.Equal($"{address}:{port}", client.Connection.Options.TargetHost);
+        Assert.Equal(targetHost, client.Connection.Options.TargetHost);
 
         await host.StopAsync(ct);
     }
@@ -42,11 +43,11 @@ public class TemporalClientIntegrationTests
     public async Task AddTemporalClient_ConfigureClientSetsNamespace()
     {
         var ct = TestContext.Current.CancellationToken;
-        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
+        var (targetHost, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
-        hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
+        hostBuilder.Configuration["ConnectionStrings:temporal"] = targetHost;
 
         hostBuilder.AddTemporalClient("temporal", opts =>
         {
@@ -66,11 +67,11 @@ public class TemporalClientIntegrationTests
     public async Task AddTemporalClient_ConfigureOptionsApplies()
     {
         var ct = TestContext.Current.CancellationToken;
-        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
+        var (targetHost, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
-        hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
+        hostBuilder.Configuration["ConnectionStrings:temporal"] = targetHost;
 
         hostBuilder.AddTemporalClient("temporal")
             .ConfigureOptions(opts => opts.Namespace = "configured-ns");
@@ -88,11 +89,11 @@ public class TemporalClientIntegrationTests
     public async Task HealthCheck_ReturnsHealthy_WhenConnected()
     {
         var ct = TestContext.Current.CancellationToken;
-        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
+        var (targetHost, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
-        hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
+        hostBuilder.Configuration["ConnectionStrings:temporal"] = targetHost;
 
         hostBuilder.AddTemporalClient("temporal");
 
@@ -112,11 +113,11 @@ public class TemporalClientIntegrationTests
     public async Task AddTemporalWorker_RegistersWorkflowAndActivities()
     {
         var ct = TestContext.Current.CancellationToken;
-        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
+        var (targetHost, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
-        hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
+        hostBuilder.Configuration["ConnectionStrings:temporal"] = targetHost;
 
         hostBuilder.AddTemporalWorker("temporal", "test-queue")
             .AddWorkflow<TestWorkflow>()
@@ -135,11 +136,11 @@ public class TemporalClientIntegrationTests
     public async Task AddTemporalWorker_ExecutesWorkflow()
     {
         var ct = TestContext.Current.CancellationToken;
-        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
+        var (targetHost, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
-        hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
+        hostBuilder.Configuration["ConnectionStrings:temporal"] = targetHost;
 
         hostBuilder.AddTemporalWorker("temporal", "e2e-queue")
             .AddWorkflow<TestWorkflow>()
@@ -163,11 +164,11 @@ public class TemporalClientIntegrationTests
     public async Task AddTemporalWorker_TransientActivities()
     {
         var ct = TestContext.Current.CancellationToken;
-        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
+        var (targetHost, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
-        hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
+        hostBuilder.Configuration["ConnectionStrings:temporal"] = targetHost;
 
         hostBuilder.AddTemporalWorker("temporal", "transient-queue")
             .AddWorkflow<TestWorkflow>()
@@ -191,11 +192,11 @@ public class TemporalClientIntegrationTests
     public async Task AddTemporalWorker_SingletonActivities()
     {
         var ct = TestContext.Current.CancellationToken;
-        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
+        var (targetHost, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
-        hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
+        hostBuilder.Configuration["ConnectionStrings:temporal"] = targetHost;
 
         hostBuilder.AddTemporalWorker("temporal", "singleton-queue")
             .AddWorkflow<TestWorkflow>()
@@ -219,11 +220,11 @@ public class TemporalClientIntegrationTests
     public async Task AddTemporalWorker_ActivitiesInstance()
     {
         var ct = TestContext.Current.CancellationToken;
-        var (address, port, aspireApp) = await StartTemporalServer(cancellationToken: ct);
+        var (targetHost, aspireApp) = await StartTemporalServer(cancellationToken: ct);
         await using var _ = aspireApp;
 
         var hostBuilder = Host.CreateApplicationBuilder();
-        hostBuilder.Configuration["ConnectionStrings:temporal"] = $"{address}:{port}";
+        hostBuilder.Configuration["ConnectionStrings:temporal"] = targetHost;
 
         hostBuilder.AddTemporalWorker("temporal", "instance-queue")
             .AddWorkflow<TestWorkflow>()
@@ -244,10 +245,10 @@ public class TemporalClientIntegrationTests
     }
 
     /// <summary>
-    /// Starts a Temporal dev server via Aspire and returns (address, port, app).
+    /// Starts a Temporal dev server via Aspire and returns (targetHost, app).
     /// Each test gets a uniquely named resource to avoid container conflicts.
     /// </summary>
-    private static async Task<(string Address, int Port, DistributedApplication App)> StartTemporalServer(
+    private static async Task<(string TargetHost, DistributedApplication App)> StartTemporalServer(
         [System.Runtime.CompilerServices.CallerMemberName] string callerName = "",
         CancellationToken cancellationToken = default)
     {
@@ -255,7 +256,9 @@ public class TemporalClientIntegrationTests
         var builder = await DistributedApplicationTestingBuilder.CreateAsync<Projects.TestAppHost>(cancellationToken);
 
         var temporal = builder.AddTemporalServerContainer(resourceName);
-        temporal.WithEndpoint(scheme: "http", targetPort: 7233, name: "grpc-direct", isProxied: false);
+
+        // Make the server endpoint non-proxied so the Temporal gRPC client can connect directly.
+        temporal.WithEndpoint("server", e => { e.IsProxied = false; e.UriScheme = "http"; });
 
         var app = await builder.BuildAsync(cancellationToken);
 
@@ -265,17 +268,14 @@ public class TemporalClientIntegrationTests
         await rns.WaitForResourceAsync(resourceName, KnownResourceStates.Running, cancellationToken)
             .WaitAsync(TimeSpan.FromSeconds(120), cancellationToken);
 
-        var directEndpoint = temporal.Resource.Annotations
-            .OfType<EndpointAnnotation>()
-            .Single(e => e.Name == "grpc-direct");
-
-        var address = directEndpoint.AllocatedEndpoint!.Address;
-        var port = directEndpoint.AllocatedEndpoint!.Port;
+        var serverEndpoint = temporal.GetEndpoint("server");
+        var uri = new Uri(serverEndpoint.Url);
+        var targetHost = $"{uri.Host}:{uri.Port}";
 
         // Allow server to fully initialize
         await Task.Delay(3000, cancellationToken);
 
-        return (address, port, app);
+        return (targetHost, app);
     }
 
     [Workflow]
