@@ -44,17 +44,17 @@ public static class AspireTemporalExtensions
                 "Ensure the Temporal resource is referenced in AppHost using .WithReference(temporal).");
         }
 
-        RegisterTemporalRuntime(builder.Services);
+        var runtime = RegisterTemporalRuntime(builder.Services);
 
         builder.Services.AddTemporalClient(opts =>
         {
             opts.TargetHost = connectionString;
+            opts.Runtime = runtime;
             opts.Interceptors = [new TracingInterceptor()];
             configureClient?.Invoke(opts);
         });
 
-        builder.Services.AddHealthChecks()
-            .AddCheck<TemporalHealthCheck>($"temporal-{connectionName}");
+        RegisterHealthCheck(builder.Services, connectionName);
 
         return new TemporalClientBuilder(builder.Services);
     }
@@ -87,27 +87,28 @@ public static class AspireTemporalExtensions
                 "Ensure the Temporal resource is referenced in AppHost using .WithReference(temporal).");
         }
 
-        RegisterTemporalRuntime(builder.Services);
+        var runtime = RegisterTemporalRuntime(builder.Services);
 
         var workerOptionsBuilder = builder.Services
             .AddTemporalClient(opts =>
             {
                 opts.TargetHost = connectionString;
+                opts.Runtime = runtime;
                 opts.Interceptors = [new TracingInterceptor()];
                 configureClient?.Invoke(opts);
             })
             .AddHostedTemporalWorker(taskQueue);
 
-        builder.Services.AddHealthChecks()
-            .AddCheck<TemporalHealthCheck>($"temporal-{connectionName}");
+        RegisterHealthCheck(builder.Services, connectionName);
 
         return new TemporalWorkerBuilder(workerOptionsBuilder, builder.Services);
     }
 
-    private static void RegisterTemporalRuntime(IServiceCollection services)
+    private static TemporalRuntime RegisterTemporalRuntime(IServiceCollection services)
     {
-        if (services.Any(d => d.ServiceType == typeof(TemporalRuntimeRegistration)))
-            return;
+        var existing = services.FirstOrDefault(d => d.ServiceType == typeof(TemporalRuntimeRegistration));
+        if (existing?.ImplementationInstance is TemporalRuntimeRegistration reg)
+            return reg.Runtime;
 
         var meter = new Meter(MeterName);
         var runtime = new TemporalRuntime(new TemporalRuntimeOptions
@@ -121,14 +122,27 @@ public static class AspireTemporalExtensions
         services.AddSingleton(new TemporalRuntimeRegistration(meter, runtime));
         services.AddSingleton(meter);
         services.AddSingleton(runtime);
+        return runtime;
     }
 
-    /// <summary>
-    /// Marker type to detect duplicate runtime registration.
-    /// </summary>
+    private static void RegisterHealthCheck(IServiceCollection services, string connectionName)
+    {
+        var healthCheckName = $"temporal-{connectionName}";
+        // Avoid duplicate health check registration when both AddTemporalClient and AddTemporalWorker are used
+        if (services.Any(d => d.ServiceType == typeof(HealthCheckRegistrationMarker)
+            && d.ImplementationInstance is HealthCheckRegistrationMarker m && m.Name == healthCheckName))
+            return;
+
+        services.AddSingleton(new HealthCheckRegistrationMarker(healthCheckName));
+        services.AddHealthChecks()
+            .AddCheck<TemporalHealthCheck>(healthCheckName);
+    }
+
     private sealed class TemporalRuntimeRegistration(Meter meter, TemporalRuntime runtime)
     {
         public Meter Meter { get; } = meter;
         public TemporalRuntime Runtime { get; } = runtime;
     }
+
+    private sealed record HealthCheckRegistrationMarker(string Name);
 }

@@ -128,13 +128,15 @@ public static class TemporalServerResourceExtensions
     }
 
     /// <summary>Sets the external UI port for the Temporal container.
-    /// The internal container port is always 8233.</summary>
+    /// The internal container port is always 8233.
+    /// Has no effect if <see cref="WithHeadlessUi"/> was called first.</summary>
     public static IResourceBuilder<TemporalServerContainerResource> WithUiPort(
         this IResourceBuilder<TemporalServerContainerResource> builder, int port)
     {
         var endpoint = builder.Resource.Annotations.OfType<EndpointAnnotation>()
-            .Single(e => e.Name == "ui");
-        endpoint.Port = port;
+            .SingleOrDefault(e => e.Name == "ui");
+        if (endpoint is not null)
+            endpoint.Port = port;
         return builder;
     }
 
@@ -178,13 +180,15 @@ public static class TemporalServerResourceExtensions
         return builder;
     }
 
-    /// <summary>Sets the UI port for the Temporal executable.</summary>
+    /// <summary>Sets the UI port for the Temporal executable.
+    /// Has no effect if <see cref="WithHeadlessUi"/> was called first.</summary>
     public static IResourceBuilder<TemporalServerExecutableResource> WithUiPort(
         this IResourceBuilder<TemporalServerExecutableResource> builder, int port)
     {
         var endpoint = builder.Resource.Annotations.OfType<EndpointAnnotation>()
-            .Single(e => e.Name == "ui");
-        endpoint.Port = port;
+            .SingleOrDefault(e => e.Name == "ui");
+        if (endpoint is not null)
+            endpoint.Port = port;
         return builder;
     }
 

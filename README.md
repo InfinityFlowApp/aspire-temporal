@@ -148,10 +148,10 @@ The dev server is configured with fluent extension methods:
 builder.AddTemporalServerContainer("temporal")
     .WithDbFileName("/location/of/persistent/file") // --db-filename
     .WithNamespace("namespace-name")                 // --namespace
-    .WithServicePort(7233)                           // --port
+    .WithServicePort(7233)                           // external host port (container internal is always 7233)
     .WithHttpPort()                                  // --http-port
     .WithMetricsEndpoint()                           // --metrics-port
-    .WithUiPort(8233)                                // --ui-port
+    .WithUiPort(8233)                                // external host port (container internal is always 8233)
     .WithHeadlessUi()                                // --headless
     .WithIp("127.0.0.1")                             // --ip
     .WithUiIp("127.0.0.1")                           // --ui-ip
