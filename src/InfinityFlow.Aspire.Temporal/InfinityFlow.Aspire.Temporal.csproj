@@ -20,6 +20,9 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="InfinityFlow.Aspire.Temporal.Tests" />
+  </ItemGroup>
     <ItemGroup>
         <!-- Assets -->
         <None Pack="true" PackagePath="" Include="assets/packageIcon.png" />
