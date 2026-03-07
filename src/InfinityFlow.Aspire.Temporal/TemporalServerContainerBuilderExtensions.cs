@@ -1,61 +1,36 @@
-﻿using Aspire.Hosting.ApplicationModel;
-
+using Aspire.Hosting.ApplicationModel;
 using InfinityFlow.Aspire.Temporal;
 
 namespace Aspire.Hosting;
+
+/// <summary>
+/// Extension methods for adding a Temporal server container resource.
+/// </summary>
 public static class TemporalServerContainerBuilderExtensions
 {
-    /// <summary>
-    /// Adds a temporal server resource instance to the Aspire host. Requires the Temporal Container location to be in your path.
-    /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="name"></param>
-    /// <param name="callback"></param>
-    /// <returns></returns>
-    public static IResourceBuilder<TemporalServerContainerResource> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name,
-        Action<TemporalServerResourceBuilder> callback)
-    {
-        var rb = new TemporalServerResourceBuilder();
-        callback(rb);
-        var args = rb.Build();
-
-        return builder.AddTemporalServerContainer(name, args);
-    }
+    internal const string TemporalServerImageName = "temporalio/admin-tools";
+    internal const string TemporalServerImageTag = "1.30.1";
 
     /// <summary>
-    /// Adds a temporal server resource instance to the Aspire host. Requires the Temporal Container location to be in your path.
+    /// Adds a Temporal dev server as a container resource.
     /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public static IResourceBuilder<TemporalServerContainerResource> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name)
+    public static IResourceBuilder<TemporalServerContainerResource> AddTemporalServerContainer(
+        this IDistributedApplicationBuilder builder, string name)
     {
-        return builder.AddTemporalServerContainer(name, new TemporalServerResourceArguments());
-    }
-    private static IResourceBuilder<TemporalServerContainerResource> AddTemporalServerContainer(this IDistributedApplicationBuilder builder, string name, TemporalServerResourceArguments args)
-    {
-        var container = new TemporalServerContainerResource(name, args);
+        var resource = new TemporalServerContainerResource(name);
 
-        var resourceBuilder = builder.AddResource(container)
-                .WithAnnotation(new ContainerImageAnnotation() { Image = "temporalio/admin-tools", Tag = "latest" })
-                .WithArgs(args.GetArgs())
-                .WithEntrypoint("temporal")
-                .WithHttpsEndpoint(name: "server", port: args.Port, targetPort: args.Port).AsHttp2Service(); // Internal port is always 7233
-
-        if (args.Headless is not true)
-        {
-            resourceBuilder.WithHttpEndpoint(name: "ui", port: args.UiPort, targetPort: args.UiPort); // Internal port is always 8233
-        }
-
-        if (args.MetricsPort is not null)
-        {
-            resourceBuilder.WithHttpEndpoint(name: "metrics", port: args.MetricsPort, targetPort: args.MetricsPort); // Internal port is always 7235
-        }
-
-        if (args.HttpPort is not null)
-        {
-            resourceBuilder.WithHttpEndpoint(name: "http", port: args.HttpPort, targetPort: args.HttpPort); // Internal port is always 7234
-        }
+        var resourceBuilder = builder.AddResource(resource)
+            .WithImage(TemporalServerImageName, TemporalServerImageTag)
+            .WithEntrypoint("temporal")
+            .WithArgs(ctx =>
+            {
+                var args = TemporalServerArgsBuilder.BuildArgs(resource);
+                foreach (var arg in args)
+                    ctx.Args.Add(arg);
+            })
+            .WithHttpsEndpoint(name: "server", targetPort: 7233).AsHttp2Service()
+            .WithHttpEndpoint(name: "ui", targetPort: 8233)
+            .WithOtlpExporter();
 
         return resourceBuilder;
     }

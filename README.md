@@ -1,116 +1,135 @@
 # InfinityFlow.Aspire.Temporal
 
 [![NuGet](https://img.shields.io/nuget/v/InfinityFlow.Aspire.Temporal.svg?style=flat)](https://www.nuget.org/packages/InfinityFlow.Aspire.Temporal)
- 
+
 [![Discord](https://discordapp.com/api/guilds/1148334798524383292/widget.png?style=banner2)](https://discord.gg/PXJFbP7PKk)
 
-Aspire extension to start the temporal cli dev server as an container or executable resource. 
+Aspire extension to start the Temporal CLI dev server as a container or executable resource, with an optional client library for automatic connection string resolution and OpenTelemetry integration.
+
 **Note: Only container works as expected. See https://github.com/dotnet/aspire/issues/1637 and https://github.com/temporalio/cli/issues/316**
 
 
 ## Contents:
 - [Pre-Requisites](#pre-requisites)
 - [Getting Started](#getting-started)
+- [Client Library](#client-library)
 - [Observability](#observability)
 - [Configuration](#configuration)
 
 ## Pre-requisites
 
-- [Temporal CLI](https://github.com/temporalio/cli) (ensure the binary is in your PATH)
 - An Aspire project. See [Aspire docs](https://learn.microsoft.com/en-us/dotnet/aspire/get-started/aspire-overview) to get started.
+- [Temporal CLI](https://github.com/temporalio/cli) (only if using the executable resource)
 
 ## Getting Started
 
-### 1. Install the nuget package
+### 1. Install the NuGet packages
 
 ```sh
+# Hosting library (AppHost project)
 dotnet add package InfinityFlow.Aspire.Temporal
+
+# Client library (Worker/API projects)
+dotnet add package InfinityFlow.Aspire.Temporal.Client
 ```
 
-### 2. Add Temporal dev server to your Aspire AppHost Program.cs
+### 2. Add Temporal dev server to your Aspire AppHost
 
 ```csharp
 // AppHost/Program.cs
-using Aspire.Temporal.Server;
+using InfinityFlow.Aspire.Temporal;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-// Use the default server options
-var temporal = await builder.AddTemporalServerContainer("temporal")
-
-// OR customise server options with builder
-//      see config section for details
-var temporal = await builder.AddTemporalServerContainer("temporal", x => x
+// Container resource (recommended)
+var temporal = builder.AddTemporalServerContainer("temporal")
     .WithLogFormat(LogFormat.Json)
     .WithLogLevel(LogLevel.Info)
-    .WithNamespace("test1", "test2"));
+    .WithNamespace("test1", "test2")
+    .WithDynamicConfigValue("frontend.enableUpdateWorkflowExecution", true);
+
+// With fixed ports (dynamic by default)
+var temporalWithPorts = builder.AddTemporalServerContainer("temporalWithPorts")
+    .WithServicePort(7233)
+    .WithUiPort(8233);
+
+// Reference from your projects
+builder.AddProject<Projects.Worker>("worker")
+    .WithReference(temporal);
+
+builder.AddProject<Projects.Api>("api")
+    .WithReference(temporal);
+
+builder.Build().Run();
 ```
 
 ### 3. Run the Aspire application
 
-You should see Temporal running under the Executables tab.
-
-Temporal will be available on its default ports:
-- Server: http://localhost:7233
-- UI: http://localhost:8233
+You should see Temporal running under the Containers tab.
 
 ![Aspire dashboard temporal exe](./docs/aspire-dashboard-exe.png)
 
-### 4. Configure Client/Worker Applications
+## Client Library
 
-The Temporal client can then be added to a .NET project as normal using the instructions from the [temporal dotnet sdk repo](https://github.com/temporalio/sdk-dotnet/)
+The `InfinityFlow.Aspire.Temporal.Client` package provides automatic connection string resolution, OpenTelemetry integration, and health checks.
 
-It can be included in Aspire orchestration like below and can optionally take a reference to the Temporal resource.
+### Register a worker
 
 ```csharp
-// ./samples/AppHost/Program.cs
+// Worker/Program.cs
+using InfinityFlow.Aspire.Temporal.Client;
 
-// ...
+var builder = Host.CreateApplicationBuilder(args);
 
-var temporal = builder.AddTemporalServerExecutable("temporal");
+builder.AddTemporalWorker("temporal", "my-task-queue", opts =>
+{
+    opts.Namespace = "my-namespace";
+})
+.AddWorkflow<MyWorkflow>()
+.AddScopedActivities<MyActivities>();
 
-builder.AddProject<Projects.Worker>("worker") // my custom project
-    .WithReference(temporal);
+builder.Build().Run();
+```
 
+### Register a client
+
+```csharp
+// Api/Program.cs
+using InfinityFlow.Aspire.Temporal.Client;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.AddTemporalClient("temporal", opts =>
+{
+    opts.Namespace = "my-namespace";
+});
+
+var app = builder.Build();
 // ...
 ```
 
-If using [Temporalio.Extensions.Hosting](https://github.com/temporalio/sdk-dotnet/blob/main/src/Temporalio.Extensions.Hosting/README.md) the client registration might look something like below. If we took the reference to the Temporal Aspire resource, then the TargetHost property is automatically injected under the key `ConnectionStrings:<Aspire Resource Name>`. (e.g., this will be `builder.Configuration["ConnectionStrings:temporal"]` for a resource named "temporal" as above)
-
-```csharp
-// register a client -  ./samples/Api/Program.cs
-builder.Services
-    .AddTemporalClient(opts =>
-    {
-        opts.TargetHost = builder.Configuration["ConnectionStrings:temporal"]; // or just self-configure localhost:7233
-        opts.Namespace = "default";
-    })
-
-// or
-
-// register a worker - ./samples/Worker/Program.cs
-builder.Services
-    .AddTemporalClient(opts =>
-    {
-        opts.TargetHost = builder.Configuration["ConnectionStrings:temporal"]; // or just self-configure localhost:7233
-        opts.Namespace = "default";
-    })
-    .AddHostedTemporalWorker("my-task-queue")
-    .AddScopedActivities<MyActivities>()
-    .AddWorkflow<MyWorkflow>();
-```
+Both `AddTemporalWorker` and `AddTemporalClient` automatically:
+- Resolve the connection string from the Aspire resource reference
+- Register a `TracingInterceptor` for distributed tracing
+- Set up a `TemporalRuntime` with `CustomMetricMeter` for metrics
+- Add a health check for the Temporal connection
 
 ## Observability
 
-The extension doesn't provide any setup for observability, but you can follow [Temporalio.Extensions.DiagnosticSource](https://github.com/temporalio/sdk-dotnet/blob/main/src/Temporalio.Extensions.DiagnosticSource/README.md) and [Temporalio.Extensions.Hosting](https://github.com/temporalio/sdk-dotnet/blob/main/src/Temporalio.Extensions.Hosting/TemporalHostingServiceCollectionExtensions.cs) to configure this on the temporal client. If using the Aspire Service Defaults, you'll need to configure the metrics and tracing accordingly.
+### Service Defaults
 
-The sample folder has an example for configuring this with the Aspire Dashboard
+Add `AddTemporalServiceDefaults()` in your service defaults to wire up OpenTelemetry meters and tracing sources:
 
-- [sample/Api/Program.cs](./sample/Api/Program.cs) for an example client
-- [sample/Worker/Program.cs](./sample/Worker/Program.cs) for an example worker
-- [sample/ServiceDefaults/Extensions.cs](./sample/ServiceDefaults/Extensions.cs) for an example of adding the custom meter and tracing sources to the service defaults.
+```csharp
+// ServiceDefaults/Extensions.cs
+using InfinityFlow.Aspire.Temporal.Client;
 
-If done correctly, you should tracing and metrics on the Aspire dashboard:
+builder.Services.AddTemporalServiceDefaults();
+```
+
+This registers the Temporal meter and `TracingInterceptor` activity sources with the OpenTelemetry pipeline. See the [sample](./sample/) for a complete example.
+
+If done correctly, you should see tracing and metrics on the Aspire dashboard:
 
 #### Tracing
 
@@ -123,30 +142,28 @@ If done correctly, you should tracing and metrics on the Aspire dashboard:
 
 ## Configuration
 
-The dev server can be configured with a fluent builder
+The dev server is configured with fluent extension methods:
 
 ```csharp
-await builder.AddTemporalServerContainer("temporal", builder => builder.WithPort(1234))
-```
-
-You can run `temporal server start-dev --help` to get more information about the CLI flags on the dev server. All available flags are mapped to a method on the builder.
-
-Available methods:
-
-```csharp
-builder
+builder.AddTemporalServerContainer("temporal")
     .WithDbFileName("/location/of/persistent/file") // --db-filename
-    .WithNamespace("namespace-name", ...)           // --namespace
-    .WithPort(7233)                                 // --port
-    .WithHttpPort(7234)                             // --http-port
-    .WithMetricsPort(7235)                          // --metrics-port
-    .UiPort(8233)                                   // --ui-port
-    .WithHeadlessUi(true)                           // --headless
-    .WithIp("127.0.0.1")                            // --ip
-    .WithUiIp("127.0.0.1")                          // --ui-ip
-    .WithUiAssetPath("/location/of/custom/assets")  // --ui-asset-path
-    .WithUiCodecEndpoint("http://localhost:8080")   // --ui-codec-endpoint
-    .WithLogFormat(LogFormat.Pretty)                // --log-format
-    .WithLogLevel(LogLevel.Info)                    // --log-level
-    .WithSQLitePragma(SQLitePragma.JournalMode)     // --sqlite-pragma
+    .WithNamespace("namespace-name")                 // --namespace
+    .WithServicePort(7233)                           // external host port (container internal is always 7233)
+    .WithHttpPort()                                  // --http-port
+    .WithMetricsEndpoint()                           // --metrics-port
+    .WithUiPort(8233)                                // external host port (container internal is always 8233)
+    .WithHeadlessUi()                                // --headless
+    .WithIp("127.0.0.1")                             // --ip
+    .WithUiIp("127.0.0.1")                           // --ui-ip
+    .WithUiAssetPath("/location/of/custom/assets")   // --ui-asset-path
+    .WithUiCodecEndpoint("http://localhost:8080")     // --ui-codec-endpoint
+    .WithLogFormat(LogFormat.Pretty)                  // --log-format
+    .WithLogLevel(LogLevel.Info)                      // --log-level
+    .WithSQLitePragma(SQLitePragma.JournalMode)       // --sqlite-pragma
+    .WithDynamicConfigValue("key", value)             // --dynamic-config-value
+    .WithLogConfig(true)                               // --log-config
+    .WithSearchAttribute("MyKey", SearchAttributeType.Keyword) // --search-attribute
+    .WithUiPublicPath("/temporal");                    // --ui-public-path
 ```
+
+You can run `temporal server start-dev --help` to get more information about the CLI flags on the dev server.

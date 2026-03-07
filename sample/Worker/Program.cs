@@ -1,37 +1,17 @@
-using System.Diagnostics.Metrics;
-
+using InfinityFlow.Aspire.Temporal.Client;
 using Temporalio.Activities;
-using Temporalio.Extensions.DiagnosticSource;
-using Temporalio.Extensions.Hosting;
-using Temporalio.Extensions.OpenTelemetry;
-using Temporalio.Runtime;
 using Temporalio.Workflows;
 
 var builder = Host.CreateApplicationBuilder(args);
 
-using var meter = new Meter("Temporal.Client");
-
-var runtime = new TemporalRuntime(new()
-{
-    Telemetry = new()
-    {
-        Metrics = new() { CustomMetricMeter = new CustomMetricMeter(meter) },
-    },
-});
-
 builder.AddServiceDefaults();
 
-builder.Services
-    .AddTemporalClient(opts =>
-    {
-        opts.TargetHost = builder.Configuration.GetConnectionString("temporal");
-        opts.Namespace = Constants.Namespace;
-        opts.Interceptors = new[] { new TracingInterceptor() };
-        opts.Runtime = runtime;
-    })
-    .AddHostedTemporalWorker(Constants.TaskQueueName)
-    .AddScopedActivities<HelloActivities>()
-    .AddWorkflow<HelloWorkflow>();
+builder.AddTemporalWorker("temporal", Constants.TaskQueueName, opts =>
+{
+    opts.Namespace = Constants.Namespace;
+})
+.AddWorkflow<HelloWorkflow>()
+.AddScopedActivities<HelloActivities>();
 
 var host = builder.Build();
 host.Run();

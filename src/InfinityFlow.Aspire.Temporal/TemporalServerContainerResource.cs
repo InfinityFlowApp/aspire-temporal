@@ -2,9 +2,9 @@ using Aspire.Hosting.ApplicationModel;
 
 namespace Aspire.Hosting;
 
-/// <summary>A Temporal dev server running as an executable resource.</summary>
+/// <summary>A Temporal dev server running as a container resource.</summary>
 /// <param name="name">The resource name.</param>
-public class TemporalServerExecutableResource(string name) : ExecutableResource(name, command: "temporal", workingDirectory: ""), InfinityFlow.Aspire.Temporal.ITemporalServerResource
+public class TemporalServerContainerResource(string name) : ContainerResource(name), InfinityFlow.Aspire.Temporal.ITemporalServerResource, IResourceWithEnvironment
 {
     /// <inheritdoc />
     public ReferenceExpression ConnectionStringExpression =>

@@ -7,7 +7,7 @@
     <IsPackable>true</IsPackable>
     <EnablePackageValidation>true</EnablePackageValidation>
     <PackageId>InfinityFlow.Aspire.Temporal</PackageId>
-    <PackageVersion>0.5.2</PackageVersion>
+    <PackageVersion>1.0.0</PackageVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -20,6 +20,9 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="InfinityFlow.Aspire.Temporal.Tests" />
+  </ItemGroup>
     <ItemGroup>
         <!-- Assets -->
         <None Pack="true" PackagePath="" Include="assets/packageIcon.png" />
@@ -28,7 +31,7 @@
  
     </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.0.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.103" PrivateAssets="All" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.2" />
   </ItemGroup>
 </Project>
