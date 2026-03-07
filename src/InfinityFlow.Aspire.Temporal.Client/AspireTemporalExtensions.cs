@@ -1,6 +1,7 @@
 using System.Diagnostics.Metrics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Temporalio.Client;
 using Temporalio.Extensions.DiagnosticSource;
@@ -52,6 +53,9 @@ public static class AspireTemporalExtensions
             configureClient?.Invoke(opts);
         });
 
+        builder.Services.AddHealthChecks()
+            .AddCheck<TemporalHealthCheck>($"temporal-{connectionName}");
+
         return new TemporalClientBuilder(builder.Services);
     }
 
@@ -93,6 +97,9 @@ public static class AspireTemporalExtensions
                 configureClient?.Invoke(opts);
             })
             .AddHostedTemporalWorker(taskQueue);
+
+        builder.Services.AddHealthChecks()
+            .AddCheck<TemporalHealthCheck>($"temporal-{connectionName}");
 
         return new TemporalWorkerBuilder(workerOptionsBuilder, builder.Services);
     }
