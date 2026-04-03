@@ -13,10 +13,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.3" />
-    <PackageReference Include="Temporalio" Version="1.11.1" />
+    <PackageReference Include="Temporalio" Version="1.13.0" />
     <PackageReference Include="Temporalio.Extensions.Hosting" Version="1.11.1" />
     <PackageReference Include="Temporalio.Extensions.DiagnosticSource" Version="1.11.1" />
-    <PackageReference Include="Temporalio.Extensions.OpenTelemetry" Version="1.11.1" />
+    <PackageReference Include="Temporalio.Extensions.OpenTelemetry" Version="1.13.0" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.0" />
   </ItemGroup>
 </Project>
