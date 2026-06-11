@@ -17,6 +17,6 @@
     <PackageReference Include="Temporalio.Extensions.Hosting" Version="1.11.1" />
     <PackageReference Include="Temporalio.Extensions.DiagnosticSource" Version="1.11.1" />
     <PackageReference Include="Temporalio.Extensions.OpenTelemetry" Version="1.11.1" />
-    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.15.0" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.16.0" />
   </ItemGroup>
 </Project>
